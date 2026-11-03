@@ -1,0 +1,106 @@
+name: Build RDP-client
+
+on:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build-ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake build-essential ninja-build \
+            libssl-dev \
+            libx11-dev libxext-dev libxcursor-dev libxrender-dev \
+            libxfixes-dev libxi-dev libxrandr-dev libxdamage-dev \
+            libxinerama-dev libxv-dev \
+            libpulse-dev libcups2-dev libfuse3-dev
+
+      - name: Configure
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/opt/RDP-client
+
+      - name: Build
+        run: cmake --build build --parallel $(nproc)
+
+      - name: Stage install
+        run: |
+          cmake --install build --prefix staging/opt/RDP-client
+          tar czf RDP-client-linux-x86_64.tar.gz -C staging .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RDP-client-linux-x86_64
+          path: RDP-client-linux-x86_64.tar.gz
+
+  build-fedora:
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          dnf install -y cmake gcc gcc-c++ ninja-build \
+            openssl-devel \
+            libX11-devel libXext-devel libXcursor-devel libXrender-devel \
+            libXfixes-devel libXi-devel libXrandr-devel libXdamage-devel \
+            libXinerama-devel libXv-devel \
+            pulseaudio-libs-devel cups-devel fuse3-devel
+
+      - name: Configure
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/opt/RDP-client
+
+      - name: Build
+        run: cmake --build build --parallel $(nproc)
+
+      - name: Stage install
+        run: |
+          cmake --install build --prefix staging/opt/RDP-client
+          tar czf RDP-client-linux-x86_64-fedora.tar.gz -C staging .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RDP-client-linux-x86_64-fedora
+          path: RDP-client-linux-x86_64-fedora.tar.gz
+
+  release:
+    needs: [build-ubuntu, build-fedora]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - name: Download Ubuntu artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: RDP-client-linux-x86_64
+
+      - name: Download Fedora artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: RDP-client-linux-x86_64-fedora
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            RDP-client-linux-x86_64.tar.gz
+            RDP-client-linux-x86_64-fedora.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

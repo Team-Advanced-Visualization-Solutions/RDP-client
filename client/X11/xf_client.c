@@ -69,6 +69,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <time.h>
 
 #include <freerdp/freerdp.h>
 #include <freerdp/constants.h>
@@ -488,6 +489,19 @@ static BOOL xf_end_paint(rdpContext* context)
 
 	hwnd->invalid->null = TRUE;
 	hwnd->ninvalid = 0;
+
+	/* Restore original window title after progress indicator expires. */
+	if (xfc->window && xfc->window_title_reset_counter > 0)
+	{
+		xfc->window_title_reset_counter--;
+		if (xfc->window_title_reset_counter == 0 && xfc->window_title_original)
+		{
+			xf_SetWindowTitleText(xfc, xfc->window->handle, xfc->window_title_original);
+			free(xfc->window_title_original);
+			xfc->window_title_original = nullptr;
+		}
+	}
+
 	return TRUE;
 }
 
@@ -1317,6 +1331,20 @@ static BOOL xf_post_connect(freerdp* instance)
 	if (!xf_create_window(xfc))
 		return FALSE;
 
+	/* Show a brief "loading…" progress indicator in the window title.
+	 * It will be restored to the original title after a few paint cycles. */
+	if (xfc->window)
+	{
+		char* original = xf_window_get_title(settings);
+		if (original)
+		{
+			xfc->window_title_original = original;
+			xf_SetWindowTitleText(xfc, xfc->window->handle,
+			                      "RDP-client — загрузка рабочего стола…");
+			xfc->window_title_reset_counter = 60; /* ~1 s at 60 fps */
+		}
+	}
+
 	if (!xf_get_pixmap_info(xfc))
 		return FALSE;
 
@@ -1413,6 +1441,12 @@ static void xf_post_disconnect(freerdp* instance)
 
 	freerdp_keyboard_remap_free(xfc->remap_table);
 	xfc->remap_table = nullptr;
+
+	if (xfc->window_title_original)
+	{
+		free(xfc->window_title_original);
+		xfc->window_title_original = nullptr;
+	}
 
 	xf_destroy_window(xfc);
 }
@@ -1529,7 +1563,12 @@ static DWORD WINAPI xf_client_thread(LPVOID param)
 			xfc->keepalive_last_nudge = 0;
 	}
 	if (xfc->keepalive)
+	{
 		WLog_INFO(TAG, "keepalive: active, nudge every %" PRIu32 "s", xfc->keepalive_interval);
+		if (xfc->keepalive_jitter)
+			WLog_INFO(TAG, "keepalive: jitter enabled (%" PRIu32 "%%)", xfc->keepalive_jitter_percent);
+		srand((unsigned)time(nullptr));
+	}
 
 	while (!freerdp_shall_disconnect_context(instance->context))
 	{
@@ -1565,9 +1604,33 @@ static DWORD WINAPI xf_client_thread(LPVOID param)
 			xf_floatbar_hide_and_show(xfc->window->floatbar);
 
 		/* Use a finite timeout when keep-alive is active so the loop wakes up
-		 * periodically even if the remote session is completely idle. */
-		const DWORD waitTimeout =
-		    (xfc->keepalive) ? (DWORD)(xfc->keepalive_interval * 1000u) : INFINITE;
+		 * periodically even if the remote session is completely idle.
+		 * With jitter the timeout varies slightly to avoid predictable patterns. */
+		DWORD waitTimeout = INFINITE;
+		if (xfc->keepalive)
+		{
+			UINT32 interval_ms = xfc->keepalive_interval * 1000u;
+			if (xfc->keepalive_jitter)
+			{
+				UINT32 max_delta = interval_ms * xfc->keepalive_jitter_percent / 100u;
+				if (max_delta > 0)
+				{
+					int delta = (int)(rand() % (2 * max_delta + 1)) - (int)max_delta;
+					int to = (int)interval_ms + delta;
+					if (to < 1000)
+						to = 1000;
+					waitTimeout = (DWORD)to;
+				}
+				else
+				{
+					waitTimeout = interval_ms;
+				}
+			}
+			else
+			{
+				waitTimeout = interval_ms;
+			}
+		}
 		waitStatus = WaitForMultipleObjects(nCount, handles, FALSE, waitTimeout);
 
 		if (waitStatus == WAIT_FAILED)
@@ -1601,15 +1664,46 @@ static DWORD WINAPI xf_client_thread(LPVOID param)
 
 					UINT16 curX = (UINT16)(xfc->common.lastX > 0 ? xfc->common.lastX : 10);
 					UINT16 curY = (UINT16)(xfc->common.lastY > 0 ? xfc->common.lastY : 10);
-					UINT16 nudgeX = (curX > 0) ? (curX - 1) : (curX + 1);
+					int dx = 0;
+					int dy = 0;
 
-					WLog_DBG(TAG, "keepalive: mouse nudge %dx%d -> %dx%d", curX, curY, nudgeX, curY);
-					freerdp_input_send_mouse_event(input, PTR_FLAGS_MOVE, nudgeX, curY);
-					freerdp_input_send_mouse_event(input, PTR_FLAGS_MOVE, curX,  curY);
+					if (xfc->keepalive_jitter)
+					{
+						/* Random direction among 8 neighbours, occasionally 2 px */
+						int r = rand() % 8;
+						dx = (r == 1 || r == 2 || r == 3) ? 1 : (r == 5 || r == 6 || r == 7) ? -1 : 0;
+						dy = (r == 3 || r == 4 || r == 5) ? 1 : (r == 7 || r == 0 || r == 1) ? -1 : 0;
+						if (rand() % 4 == 0)
+						{
+							dx *= 2;
+							dy *= 2;
+						}
+					}
+					else
+					{
+						dx = -1;
+					}
 
-					WLog_DBG(TAG, "keepalive: LShift tap");
-					freerdp_input_send_keyboard_event_ex(input, TRUE,  FALSE, RDP_SCANCODE_LSHIFT);
-					freerdp_input_send_keyboard_event_ex(input, FALSE, FALSE, RDP_SCANCODE_LSHIFT);
+					UINT16 nudgeX = (curX + dx < 0) ? 0 : (UINT16)(curX + dx);
+					UINT16 nudgeY = (curY + dy < 0) ? 0 : (UINT16)(curY + dy);
+
+					WLog_DBG(TAG, "keepalive: mouse nudge %dx%d -> %dx%d", curX, curY, nudgeX, nudgeY);
+					freerdp_input_send_mouse_event(input, PTR_FLAGS_MOVE, nudgeX, nudgeY);
+					freerdp_input_send_mouse_event(input, PTR_FLAGS_MOVE, curX, curY);
+
+					/* Randomly use LShift or RShift to vary the input signature. */
+					if (!xfc->keepalive_jitter || (rand() % 2 == 0))
+					{
+						WLog_DBG(TAG, "keepalive: LShift tap");
+						freerdp_input_send_keyboard_event_ex(input, TRUE, FALSE, RDP_SCANCODE_LSHIFT);
+						freerdp_input_send_keyboard_event_ex(input, FALSE, FALSE, RDP_SCANCODE_LSHIFT);
+					}
+					else
+					{
+						WLog_DBG(TAG, "keepalive: RShift tap");
+						freerdp_input_send_keyboard_event_ex(input, TRUE, FALSE, RDP_SCANCODE_RSHIFT);
+						freerdp_input_send_keyboard_event_ex(input, FALSE, FALSE, RDP_SCANCODE_RSHIFT);
+					}
 				}
 			}
 		}
@@ -1635,6 +1729,13 @@ static DWORD WINAPI xf_client_thread(LPVOID param)
 
 				if (freerdp_get_last_error(context) == FREERDP_ERROR_SUCCESS)
 					WLog_ERR(TAG, "Failed to check RDP file descriptor");
+
+				/* Audible bell on unexpected disconnect. */
+				if (xfc->display)
+				{
+					XBell(xfc->display, 0);
+					XFlush(xfc->display);
+				}
 
 				break;
 			}

@@ -213,7 +213,7 @@ const char* window_styles_ex_to_string(UINT32 styleEx, char* buffer, size_t leng
 	return buffer;
 }
 
-static void xf_SetWindowTitleText(xfContext* xfc, Window window, const char* name)
+void xf_SetWindowTitleText(xfContext* xfc, Window window, const char* name)
 {
 	WINPR_ASSERT(xfc);
 	WINPR_ASSERT(name);

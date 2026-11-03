@@ -33,6 +33,10 @@ static const COMMAND_LINE_ARGUMENT_A xf_args[] = {
 	  nullptr, nullptr, -1, nullptr,
 	  "Имитировать активность пользователя (смещение мыши ±1 px + Shift) каждые N секунд, "
 	  "чтобы удалённая сессия не блокировалась по таймауту (по умолч.: off)" },
+	{ "keepalive-jitter", COMMAND_LINE_VALUE_BOOL | COMMAND_LINE_VALUE_OPTIONAL,
+	  "<процент, по умолч. 25>", nullptr, nullptr, -1, nullptr,
+	  "Добавить случайное отклонение к интервалу keepalive и траектории мыши, чтобы сессия "
+	  "выглядела более 'человечно' (по умолч.: on при /keepalive)" },
 	{ nullptr, 0, nullptr, nullptr, nullptr, -1, nullptr, nullptr }
 };
 
@@ -71,6 +75,30 @@ static int xf_client_handle_option(const COMMAND_LINE_ARGUMENT_A* arg, void* cus
 		}
 		return 0;
 	}
+	if (arg->Name && (strcmp(arg->Name, "keepalive-jitter") == 0))
+	{
+		if (arg->Value == BoolValueFalse)
+		{
+			xfc->keepalive_jitter = FALSE;
+		}
+		else if (arg->Value && (arg->Value != BoolValueTrue))
+		{
+			const int pct = atoi(arg->Value);
+			if (pct < 5)
+				xfc->keepalive_jitter_percent = 5;
+			else if (pct > 90)
+				xfc->keepalive_jitter_percent = 90;
+			else
+				xfc->keepalive_jitter_percent = (UINT32)pct;
+			xfc->keepalive_jitter = TRUE;
+		}
+		else
+		{
+			xfc->keepalive_jitter_percent = 25;
+			xfc->keepalive_jitter = TRUE;
+		}
+		return 0;
+	}
 	return 0;
 }
 
@@ -84,6 +112,8 @@ int xf_client_settings_parse_command_line(xfContext* xfc, int argc, char** argv)
 	xfc->deferAlt = FALSE;
 	xfc->keepalive = FALSE;
 	xfc->keepalive_interval = 300;
+	xfc->keepalive_jitter = TRUE;
+	xfc->keepalive_jitter_percent = 25;
 	return freerdp_client_settings_parse_command_line_ex(xfc->common.context.settings, argc, argv,
 	                                                     FALSE, args, ARRAYSIZE(args) - 1,
 	                                                     xf_client_handle_option, xfc);

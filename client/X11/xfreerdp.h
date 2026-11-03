@@ -191,6 +191,12 @@ struct xf_context
 	BOOL keepalive;
 	UINT32 keepalive_interval; /* seconds between nudges */
 	long long keepalive_last_nudge; /* CLOCK_MONOTONIC nanoseconds of last nudge */
+	BOOL keepalive_jitter;
+	UINT32 keepalive_jitter_percent; /* max deviation from interval, 0-100 */
+
+	/* Original window title, restored after connection progress indicator. */
+	char* window_title_original;
+	int window_title_reset_counter;
 
 	int XInputOpcode;
 

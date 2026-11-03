@@ -104,6 +104,7 @@ BOOL xf_AppWindowInit(xfContext* xfc, xfAppWindow* appWindow);
 
 BOOL xf_AppWindowResize(xfContext* xfc, xfAppWindow* appWindow);
 
+void xf_SetWindowTitleText(xfContext* xfc, Window window, const char* name);
 void xf_SetWindowText(xfContext* xfc, xfAppWindow* appWindow, const char* name);
 
 /* return: redraw required  */
