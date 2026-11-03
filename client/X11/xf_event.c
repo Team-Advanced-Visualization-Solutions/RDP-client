@@ -865,6 +865,10 @@ static BOOL xf_event_ConfigureNotify(xfContext* xfc, const XConfigureEvent* even
 		{
 			xfc->window->width = event->width;
 			xfc->window->height = event->height;
+			/* Redraw immediately so newly-exposed areas show the calm grey
+			 * background from the primary pixmap instead of garbage / desktop
+			 * wallpaper leaking through. */
+			xf_draw_screen(xfc, 0, 0, event->width, event->height);
 #ifdef WITH_XRENDER
 			xfc->offset_x = 0;
 			xfc->offset_y = 0;
