@@ -1,27 +1,27 @@
 #!/bin/bash
-# Install RDP-client to /opt/RDP-client
+# Скрипт установки RDP-client в /opt/RDP-client
 
 set -e
 
 BUILD_DIR="${1:-build}"
 if [ ! -f "$BUILD_DIR/client/X11/rdp-client" ]; then
-    echo "Error: rdp-client binary not found in $BUILD_DIR"
-    echo "Run first: mkdir build && cd build && cmake .. && cmake --build ."
+    echo "Ошибка: бинарник rdp-client не найден в $BUILD_DIR"
+    echo "Сначала соберите: mkdir build && cd build && cmake .. && cmake --build ."
     exit 1
 fi
 
-# Install to /opt/RDP-client
-echo "Installing RDP-client to /opt/RDP-client ..."
+# Установка в /opt/RDP-client
+echo "Установка RDP-client в /opt/RDP-client ..."
 sudo cmake --install "$BUILD_DIR"
 
-# Create symlink
-echo "Creating symlink /usr/local/bin/rdp-client ..."
+# Создание symlink
+echo "Создание ссылки /usr/local/bin/rdp-client ..."
 sudo ln -sf /opt/RDP-client/bin/rdp-client /usr/local/bin/rdp-client
 
-# Verify
+# Проверка
 echo ""
-echo "Installation complete!"
+echo "Установка завершена!"
 echo "---"
 /opt/RDP-client/bin/rdp-client --version
 echo "---"
-echo "Usage: rdp-client /v:<server> /u:<user>"
+echo "Использование: rdp-client /v:<сервер> /u:<пользователь>"
