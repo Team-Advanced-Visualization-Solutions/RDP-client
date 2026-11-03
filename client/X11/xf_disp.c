@@ -41,7 +41,7 @@
 
 #include <freerdp/log.h>
 #define TAG CLIENT_TAG("x11disp")
-#define RESIZE_MIN_DELAY_NS 500000000UL /* minimum delay in ms between two resizes */
+#define RESIZE_MIN_DELAY_NS 1000000000UL /* 1 s: wait until resizing is finished before notifying the server */
 
 struct s_xfDispContext
 {
