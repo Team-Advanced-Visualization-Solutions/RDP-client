@@ -11,7 +11,7 @@ RDP-client — упрощённый форк FreeRDP, из которого уд
 ## Возможности
 
 - **Нативный X11-клиент** — работает на любом Linux/BSD-десктопе с X11
-- **Режим keep-alive** — предотвращает блокировку сессии по таймауту командой `--keepalive <секунды>`
+- **Режим keep-alive** — предотвращает блокировку сессии по таймауту (`/keepalive`, не включается автоматически — передавайте явно)
 - **Метаданные сборки** — каждый бинарник содержит дату/время сборки и имя сборщика
 - **Чистое версионирование** — никаких суффиксов `dev0` и хешей git в `--version`
 - **Современные кодеки** — RFX, NSCodec, GFX pipeline
@@ -84,11 +84,18 @@ cmake --install . --prefix /tmp/staging/opt/RDP-client
 # Простое подключение
 rdp-client /v:server.example.com /u:username /p:password
 
-# Поддержание сессии каждые 5 минут
-rdp-client /v:server /u:user /p:pass --keepalive
+# ⚠️ Keep-alive: предотвращает блокировку сессии по таймауту
+# Флаг нужно передавать ЯВНО, он НЕ включён по умолчанию!
+#
+# Каждые 5 минут имитируется микро-движение мыши + нажатие Shift.
+# Визуально незаметно, но Windows сбрасывает idle-таймер.
+rdp-client /v:server /u:user /p:pass /keepalive
+
+# Быстрая проверка — интервал 60 секунд
+rdp-client /v:server /u:user /keepalive:60
 
 # Свой интервал (30 секунд)
-rdp-client /v:server /u:user --keepalive:30
+rdp-client /v:server /u:user /keepalive:30
 
 # Полный экран на всех мониторах
 rdp-client /v:server /u:user /f /multimon
@@ -112,7 +119,7 @@ rdp-client /v:server /u:user /w:1920 /h:1080 /gfx
 | `/multimon` | Использовать все мониторы |
 | `/gfx` | Включить RDPGFX pipeline |
 | `/network:<type>` | Тип соединения (broadband, lan и т.д.) |
-| `--keepalive[:N]` | Имитация активности каждые N секунд (по умолчанию 300) |
+| `/keepalive[:N]` | **Предотвращение блокировки** — имитация активности каждые N сек (по умолч. 300). Необходимо передавать явно! |
 | `+clipboard` / `-clipboard` | Включить/отключить буфер обмена |
 | `+fonts` | Сглаживание шрифтов |
 | `+aero` | Композитный рабочий стол |
@@ -148,7 +155,7 @@ RDP-client/
 | Имя бинарника | `xfreerdp` / `sdl-freerdp` / `wlfreerdp` | **`rdp-client`** |
 | Библиотеки | `libfreerdp3.so` / `libfreerdp-client3.so` / `libwinpr3.so` | `librdp-core.so` / `librdp-client-base.so` / `librdp-winpr.so` |
 | Строка версии | `FreeRDP version 3.x.x-dev0 (githash)` | `RDP-client 1.x.x (protocol engine 3.x.x, built YYYY-MM-DD HH:MM:SS by user)` |
-| Keepalive | Не доступен | `--keepalive` встроен |
+| Keepalive | Не доступен | `/keepalive` встроен |
 | Фон окна | Чёрный | **Тёмно-серый `#333333`** |
 | Ресайз | Мерцание | **Антифликер** |
 

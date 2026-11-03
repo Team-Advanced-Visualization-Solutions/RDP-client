@@ -31,8 +31,8 @@ static const COMMAND_LINE_ARGUMENT_A xf_args[] = {
 	  "меню удалённого приложения. Полезно вместе с -grab-keyboard (по умолч.: off)" },
 	{ "keepalive", COMMAND_LINE_VALUE_BOOL | COMMAND_LINE_VALUE_OPTIONAL, "<секунды, по умолч. 300>",
 	  nullptr, nullptr, -1, nullptr,
-	  "Имитировать активность пользователя (мышь + клавиша F15) каждые N секунд, чтобы "
-	  "удалённая сессия не блокировалась по таймауту (по умолч.: off)" },
+	  "Имитировать активность пользователя (смещение мыши ±1 px + Shift) каждые N секунд, "
+	  "чтобы удалённая сессия не блокировалась по таймауту (по умолч.: off)" },
 	{ nullptr, 0, nullptr, nullptr, nullptr, -1, nullptr, nullptr }
 };
 
