@@ -68,7 +68,7 @@ sudo ln -sf /opt/RDP-client/bin/rdp-client /usr/local/bin/rdp-client
 ```bash
 git clone git@github.com:Team-Advanced-Visualization-Solutions/RDP-client.git
 cd RDP-client
-git checkout v1.0.1          # <-- конкретная версия
+git checkout v1.0.2          # <-- конкретная версия
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . -j$(nproc)
@@ -82,7 +82,7 @@ sudo ln -sf /opt/RDP-client/bin/rdp-client /usr/local/bin/rdp-client
 
 ```bash
 rdp-client --version
-# RDP-client 1.0.1 (protocol engine 3.32.3, built YYYY-MM-DD HH:MM:SS by user)
+# RDP-client 1.0.2 (protocol engine 3.32.3, built YYYY-MM-DD HH:MM:SS by user)
 ```
 
 ---

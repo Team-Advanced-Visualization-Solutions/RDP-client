@@ -142,7 +142,7 @@ set(FREERDP_VERSION_FULL "${FREERDP_VERSION}")
 message("FREERDP_VERSION=${FREERDP_VERSION_FULL}")
 
 # RDP-client own version (independent from upstream FreeRDP version)
-set(RDP_CLIENT_VERSION "1.0.1")
+set(RDP_CLIENT_VERSION "1.0.2")
 set(RDP_CLIENT_VERSION_FULL "${RDP_CLIENT_VERSION}")
 add_compile_definitions(RDP_CLIENT_VERSION="${RDP_CLIENT_VERSION}")
 add_compile_definitions(RDP_CLIENT_VERSION_FULL="${RDP_CLIENT_VERSION_FULL}")
