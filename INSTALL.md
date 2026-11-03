@@ -26,6 +26,17 @@ sudo dnf install cmake gcc openssl-devel \
     pulseaudio-libs-devel cups-devel fuse3-devel
 ```
 
+### Установка зависимостей (ALT Linux / Simply Linux)
+
+```bash
+su -
+apt-get install cmake gcc-c++ libssl-devel \
+    libX11-devel libXext-devel libXcursor-devel \
+    libXrender-devel libXfixes-devel libXi-devel libXrandr-devel \
+    libXdamage-devel libXinerama-devel \
+    pulseaudio-devel libcups-devel fuse3-devel
+```
+
 ### Установка зависимостей (Debian/Ubuntu)
 
 ```bash
