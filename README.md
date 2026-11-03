@@ -1,40 +1,32 @@
 # RDP-client
 
-Modern X11 RDP client based on FreeRDP 3.x — stripped down, refactored, and focused on a single goal: fast and reliable remote desktop sessions under Linux.
+Современный X11 RDP-клиент на базе движка FreeRDP 3.x — очищенный, переработанный и сфокусированный на одной цели: быстрые и надёжные удалённые рабочие столы под Linux.
 
-## What is this?
+## Что это?
 
-RDP-client is a streamlined, modernized fork of FreeRDP 3.x focused exclusively on the X11 Linux client. It strips the server, alternative frontends, and heavy tooling — keeping only the core RDP engine and essential virtual channels.
+RDP-client — упрощённый форк FreeRDP, из которого удалены сервер, альтернативные клиенты (SDL, Wayland, Windows, macOS, Android, iOS) и тяжёлые инструменты. Остаётся только X11-клиент с ядром протокола и необходимыми виртуальными каналами.
 
-## Versioning
+## Возможности
 
-RDP-client uses its own release numbering (e.g. **1.0.0**), independent from upstream FreeRDP. The protocol engine version is shown alongside for reference:
+- **Нативный X11-клиент** — работает на любом Linux/BSD-десктопе с X11
+- **Режим keep-alive** — предотвращает блокировку сессии по таймауту командой `--keepalive <секунды>`
+- **Метаданные сборки** — каждый бинарник содержит дату/время сборки и имя сборщика
+- **Чистое версионирование** — никаких суффиксов `dev0` и хешей git в `--version`
+- **Современные кодеки** — RFX, NSCodec, GFX pipeline
+- **Виртуальные каналы** — cliprdr, disp, rail, rdpgfx, rdpsnd, drive, smartcard, printer и др.
+- **FUSE-clipboard** — drag & drop файлов через FUSE3
+- **Тёмно-серый фон** — `#333333` вместо чёрного при загрузке
+- **Антифликер ресайз** — плавное изменение размера окна
 
-```
-RDP-client 1.0.0 (protocol engine 3.32.3, built 2026-11-03 04:50:26 by user)
-```
-
-## Features
-
-- **X11 native client** — runs on any Linux/BSD desktop with X11
-- **Keep-alive mode** — prevents session idle-lock with `--keepalive <seconds>`
-- **Build metadata** — every binary embeds build date/time and builder name
-- **Clean versioning** — no git suffix noise in `--version`
-- **Modern codecs** — RFX, NSCodec, GFX pipeline
-- **Virtual channels** — cliprdr, disp, rail, rdpgfx, rdpsnd, drive, smartcard, printer, and more
-- **FUSE clipboard** — drag & drop files via FUSE3
-
-## Building
-
-### Requirements
+## Системные требования
 
 - CMake ≥ 3.13
-- C compiler (GCC or Clang)
+- C-компилятор (GCC или Clang)
 - OpenSSL ≥ 1.1.1
 - X11 development libraries (`libX11-devel`, `libXext-devel`, `libXcursor-devel`, `libXrender-devel`, `libXfixes-devel`, `libXi-devel`, `libXrandr-devel`)
-- Optional but recommended: FFmpeg, PulseAudio/ALSA, libusb-1.0, libcups, FUSE3
+- Опционально: FFmpeg, PulseAudio/ALSA, libusb-1.0, libcups, FUSE3
 
-### Quick build
+## Быстрая сборка
 
 ```bash
 mkdir build && cd build
@@ -42,114 +34,134 @@ cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . -j$(nproc)
 ```
 
-### Result (in build directory)
+### Результат (в каталоге build)
 
 ```
-client/X11/rdp-client           # main binary
+client/X11/rdp-client           # главный бинарник
 client/common/librdp-client-base.so
 libfreerdp/librdp-core.so
 winpr/libwinpr/librdp-winpr.so
 ```
 
-### Install (self-contained to `/opt/RDP-client`)
+## Установка (в /opt/RDP-client)
 
-By default the project installs to `/opt/RDP-client` so it never conflicts with your distribution's FreeRDP packages. The binary carries the correct `RPATH` (`$ORIGIN/../lib64`), so no `LD_LIBRARY_PATH` tricks are needed — it finds its own libraries automatically.
+По умолчанию проект устанавливается в `/opt/RDP-client`, чтобы не конфликтовать с системным FreeRDP. Бинарник несёт правильный `RPATH` (`$ORIGIN/../lib64`), поэтому `LD_LIBRARY_PATH` не нужен — библиотеки находятся автоматически.
 
 ```bash
 cd build
 sudo cmake --install .
 ```
 
-After installation:
+После установки:
 
 ```bash
 /opt/RDP-client/bin/rdp-client --version
 ```
 
-Add to your `PATH`:
+Добавьте в PATH:
 
 ```bash
 export PATH="/opt/RDP-client/bin:$PATH"
 ```
 
-Or symlink if you prefer:
+Или создайте symlink:
 
 ```bash
 sudo ln -s /opt/RDP-client/bin/rdp-client /usr/local/bin/rdp-client
 ```
 
-You can also stage the install into another directory (e.g. for packaging):
+Staging для упаковки:
 
 ```bash
 cmake --install . --prefix /tmp/staging/opt/RDP-client
 ```
 
-## Usage
+## Использование
 
 ```bash
-# Basic connection
-./rdp-client /v:server.example.com /u:username /p:password
+# Простое подключение
+rdp-client /v:server.example.com /u:username /p:password
 
-# Keep session alive every 5 minutes
-./rdp-client /v:server /u:user /p:pass --keepalive
+# Поддержание сессии каждые 5 минут
+rdp-client /v:server /u:user /p:pass --keepalive
 
-# Custom interval (30 seconds)
-./rdp-client /v:server /u:user --keepalive:30
+# Свой интервал (30 секунд)
+rdp-client /v:server /u:user --keepalive:30
 
-# Fullscreen with all monitors
-./rdp-client /v:server /u:user /f /multimon
+# Полный экран на всех мониторах
+rdp-client /v:server /u:user /f /multimon
 
-# Drive redirection
-./rdp-client /v:server /u:user /drive:home,/home/user
+# Перенаправление диска
+rdp-client /v:server /u:user /drive:home,/home/user
+
+# Фиксированный размер + графика
+rdp-client /v:server /u:user /w:1920 /h:1080 /gfx
 ```
 
-### Key options
+### Основные параметры
 
-| Option | Description |
-|--------|-------------|
-| `/v:<host>` | Server hostname or IP |
-| `/u:<user>` | Username |
-| `/p:<pass>` | Password |
-| `/f` | Fullscreen |
-| `/w:<w> /h:<h>` | Custom resolution |
-| `/multimon` | Use all monitors |
-| `/gfx` | Enable RDPGFX pipeline |
-| `/network:<type>` | Connection type (broadband, lan, etc.) |
-| `--keepalive[:N]` | Send idle-proof ping every N seconds (default 300) |
-| `+clipboard` / `-clipboard` | Enable/disable clipboard |
-| `+fonts` | Smooth fonts |
-| `+aero` | Desktop composition |
+| Параметр | Описание |
+|----------|----------|
+| `/v:<хост>` | Имя или IP сервера |
+| `/u:<user>` | Имя пользователя |
+| `/p:<pass>` | Пароль |
+| `/f` | Полный экран |
+| `/w:<w> /h:<h>` | Произвольное разрешение |
+| `/multimon` | Использовать все мониторы |
+| `/gfx` | Включить RDPGFX pipeline |
+| `/network:<type>` | Тип соединения (broadband, lan и т.д.) |
+| `--keepalive[:N]` | Имитация активности каждые N секунд (по умолчанию 300) |
+| `+clipboard` / `-clipboard` | Включить/отключить буфер обмена |
+| `+fonts` | Сглаживание шрифтов |
+| `+aero` | Композитный рабочий стол |
+| `/drive:<name>,<path>` | Перенаправление локального диска |
+| `/sound` | Перенаправление звука |
+| `/mic` | Перенаправление микрофона |
+| `/printer` | Перенаправление принтера |
 
-## Project structure
+## Структура проекта
 
 ```
 RDP-client/
+├── README.md                   # этот файл
+├── CMakeLists.txt              # project(RDP-client)
+├── INSTALL.sh                  # скрипт установки
 ├── client/
-│   ├── common/          # librdp-client-base.so — shared client logic
-│   └── X11/             # rdp-client binary + X11 frontend
-├── libfreerdp/          # librdp-core.so — RDP protocol engine
-├── winpr/               # librdp-winpr.so — Windows API compatibility layer
-├── channels/            # Virtual channel plugins (client only)
-├── include/             # Public headers
-└── cmake/               # Build system modules
+│   ├── common/                 # librdp-client-base.so — общая логика клиента
+│   └── X11/                    # rdp-client — X11-фронтенд
+├── libfreerdp/                 # librdp-core.so — движок RDP-протокола
+├── winpr/                      # librdp-winpr.so — совместимость с Windows API
+├── channels/                   # плагины виртуальных каналов (только клиент)
+├── include/                    # публичные заголовки
+└── cmake/                      # модули сборки
 ```
 
-## Differences from upstream FreeRDP
+## Отличия от upstream FreeRDP
 
 | | FreeRDP | RDP-client |
 |--|---------|------------|
-| Clients | X11, SDL, Wayland, Windows, macOS, Android, iOS | **X11 only** |
-| Server | Full server + proxy | **Removed** |
-| Size | ~100+ MB sources | **~66 MB** |
-| Binary name | `xfreerdp` / `sdl-freerdp` / `wlfreerdp` | **`rdp-client`** |
-| Libraries | `libfreerdp3.so` / `libfreerdp-client3.so` / `libwinpr3.so` | `librdp-core.so` / `librdp-client-base.so` / `librdp-winpr.so` |
-| Version string | `FreeRDP version 3.x.x-dev0 (githash)` | `RDP-client 1.x.x (protocol engine 3.x.x, built YYYY-MM-DD HH:MM:SS by user)` |
-| Keepalive | Not available | `--keepalive` built-in |
+| Клиенты | X11, SDL, Wayland, Windows, macOS, Android, iOS | **Только X11** |
+| Сервер | Полный сервер + прокси | **Удалён** |
+| Размер исходников | ~100+ МБ | **~66 МБ** |
+| Имя бинарника | `xfreerdp` / `sdl-freerdp` / `wlfreerdp` | **`rdp-client`** |
+| Библиотеки | `libfreerdp3.so` / `libfreerdp-client3.so` / `libwinpr3.so` | `librdp-core.so` / `librdp-client-base.so` / `librdp-winpr.so` |
+| Строка версии | `FreeRDP version 3.x.x-dev0 (githash)` | `RDP-client 1.x.x (protocol engine 3.x.x, built YYYY-MM-DD HH:MM:SS by user)` |
+| Keepalive | Не доступен | `--keepalive` встроен |
+| Фон окна | Чёрный | **Тёмно-серый `#333333`** |
+| Ресайз | Мерцание | **Антифликер** |
 
-## License
+## Версионирование
 
-Apache License 2.0 (same as upstream FreeRDP).
+RDP-client использует собственную сквозную нумерацию релизов (например, **1.0.0**), независимую от upstream FreeRDP. Версия протокольного движка показывается рядом для справки:
 
-## Acknowledgments
+```
+RDP-client 1.0.0 (protocol engine 3.32.3, built 2026-11-03 04:50:26 by user)
+```
 
-Based on FreeRDP 3.x — https://github.com/FreeRDP/FreeRDP
+## Лицензия
+
+Apache License 2.0 (как и upstream FreeRDP).
+
+## Благодарности
+
+Основано на FreeRDP 3.x — https://github.com/FreeRDP/FreeRDP

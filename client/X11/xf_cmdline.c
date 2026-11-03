@@ -27,12 +27,12 @@
 
 static const COMMAND_LINE_ARGUMENT_A xf_args[] = {
 	{ "defer-alt", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueFalse, nullptr, -1, nullptr,
-	  "Defer Alt key down until another key is pressed. When enabled, Alt-Tab will not activate "
-	  "the remote application menu. Useful when used together with -grab-keyboard (default: off)" },
-	{ "keepalive", COMMAND_LINE_VALUE_BOOL | COMMAND_LINE_VALUE_OPTIONAL, "<seconds, default 300>",
+	  "Откладывать нажатие Alt до нажатия другой клавиши. При включении Alt-Tab не активирует "
+	  "меню удалённого приложения. Полезно вместе с -grab-keyboard (по умолч.: off)" },
+	{ "keepalive", COMMAND_LINE_VALUE_BOOL | COMMAND_LINE_VALUE_OPTIONAL, "<секунды, по умолч. 300>",
 	  nullptr, nullptr, -1, nullptr,
-	  "Send a tiny mouse nudge every <N> seconds while idle, so the remote session does not "
-	  "lock (default: off)" },
+	  "Имитировать активность пользователя (мышь + клавиша F15) каждые N секунд, чтобы "
+	  "удалённая сессия не блокировалась по таймауту (по умолч.: off)" },
 	{ nullptr, 0, nullptr, nullptr, nullptr, -1, nullptr, nullptr }
 };
 

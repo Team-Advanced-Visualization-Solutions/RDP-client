@@ -695,8 +695,8 @@ static void freerdp_client_print_command_line_usage(int argc, char** argv)
 	if (argc > 0)
 		name = argv[0];
 	printf("\n");
-	printf("%s - A Free Remote Desktop Protocol Implementation\n", name);
-	printf("To show full command line help type\n");
+	printf("%s — клиент удалённых рабочих столов (RDP)\n", name);
+	printf("Для просмотра справки выполните:\n");
 	printf("%s /?\n", name);
 	printf("\n");
 }
@@ -716,22 +716,22 @@ BOOL freerdp_client_print_command_line_help_ex(int argc, char** argv,
 		name = argv[0];
 
 	printf("\n");
-	printf("%s - A Free Remote Desktop Protocol Implementation\n", name);
-	printf("See www.freerdp.com for more information\n");
+	printf("%s — клиент удалённых рабочих столов (RDP)\n", name);
+	printf("Подробнее: www.freerdp.com\n");
 	printf("\n");
-	printf("Usage: %s [file] [options] [/v:<server>[:port]]\n", argv[0]);
+	printf("Использование: %s [файл] [параметры] [/v:<сервер>[:порт]]\n", argv[0]);
 	printf("\n");
-	printf("Syntax:\n");
-	printf("    /flag (enables flag)\n");
-	printf("    /option:<value> (specifies option with value)\n");
-	printf("    +toggle -toggle (enables or disables toggle, where '/' is a synonym of '+')\n");
+	printf("Синтаксис:\n");
+	printf("    /флаг      (включает флаг)\n");
+	printf("    /параметр:<значение> (задаёт значение параметра)\n");
+	printf("    +переключатель -переключатель (вкл/выкл, «/» — синоним «+»)\n");
 	printf("\n");
 
 	freerdp_client_print_command_line_args(largs, lcount);
 	free(largs);
 
 	printf("\n");
-	printf("Examples:\n");
+	printf("Примеры:\n");
 	printf("    %s connection.rdp /p:Pwd123! /f\n", name);
 	printf("    %s /u:CONTOSO\\JohnDoe /p:Pwd123! /v:rdp.contoso.com\n", name);
 	printf("    %s /u:JohnDoe /p:Pwd123! /w:1366 /h:768 /v:192.168.1.100:4489\n", name);
