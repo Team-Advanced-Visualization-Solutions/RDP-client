@@ -867,10 +867,9 @@ static BOOL xf_event_ConfigureNotify(xfContext* xfc, const XConfigureEvent* even
 			const int oldH = xfc->window->height;
 			xfc->window->width = event->width;
 			xfc->window->height = event->height;
-			/* When the window grows, newly-exposed pixels show garbage or
-			 * desktop wallpaper.  Fill ONLY the newly-exposed edges with
-			 * grey and copy the old visible area back from the primary
-			 * pixmap so the existing image (e.g. login screen) is preserved. */
+			/* When the window grows, X11 may show garbage on the newly-exposed
+			 * pixels.  Fill ONLY the newly-exposed right / bottom strips with
+			 * grey; the old visible area is left intact by the server. */
 			if (event->width > oldW || event->height > oldH)
 			{
 				XGCValues gcv = WINPR_C_ARRAY_INIT;
@@ -891,8 +890,6 @@ static BOOL xf_event_ConfigureNotify(xfContext* xfc, const XConfigureEvent* even
 					               WINPR_ASSERTING_INT_CAST(uint32_t, event->height - oldH));
 				XFreeGC(xfc->display, fillGC);
 			}
-			/* Restore the old visible area from the primary pixmap. */
-			xf_draw_screen(xfc, 0, 0, oldW, oldH);
 #ifdef WITH_XRENDER
 			xfc->offset_x = 0;
 			xfc->offset_y = 0;

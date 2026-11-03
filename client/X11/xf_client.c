@@ -354,6 +354,8 @@ static BOOL xf_desktop_resize(rdpContext* context)
 	{
 		const BOOL same = (xfc->primary == xfc->drawing);
 		const Pixmap oldPrimary = xfc->primary;
+		const UINT32 oldW = xfc->primaryWidth;
+		const UINT32 oldH = xfc->primaryHeight;
 		const UINT32 newW = freerdp_settings_get_uint32(settings, FreeRDP_DesktopWidth);
 		const UINT32 newH = freerdp_settings_get_uint32(settings, FreeRDP_DesktopHeight);
 
@@ -363,10 +365,11 @@ static BOOL xf_desktop_resize(rdpContext* context)
 		          WINPR_ASSERTING_INT_CAST(uint32_t, xfc->depth))))
 			return FALSE;
 
-		/* Instead of copying the old (possibly stale) pixmap content,
-		 * fill the entire new surface with a calm dark-grey background.
-		 * This is easier on the eyes than a stretched, frozen frame
-		 * while we wait for the server repaint. */
+		/* Copy old content top-left aligned and fill exposed edges grey.
+		 * This avoids black flash while keeping existing image intact. */
+		XCopyArea(xfc->display, oldPrimary, xfc->primary, xfc->gc,
+		          0, 0, oldW, oldH, 0, 0);
+		if (newW > oldW || newH > oldH)
 		{
 			XGCValues gcv = WINPR_C_ARRAY_INIT;
 			gcv.foreground = XF_BACKGROUND_COLOR;
@@ -375,10 +378,16 @@ static BOOL xf_desktop_resize(rdpContext* context)
 			GC fillGC =
 			    XCreateGC(xfc->display, xfc->primary,
 			              GCForeground | GCFunction | GCFillStyle, &gcv);
-			XFillRectangle(xfc->display, xfc->primary, fillGC,
-			               0, 0,
-			               WINPR_ASSERTING_INT_CAST(unsigned int, newW),
-			               WINPR_ASSERTING_INT_CAST(unsigned int, newH));
+			if (newW > oldW)
+				XFillRectangle(xfc->display, xfc->primary, fillGC,
+				               WINPR_ASSERTING_INT_CAST(int, oldW), 0,
+				               WINPR_ASSERTING_INT_CAST(uint32_t, newW - oldW),
+				               WINPR_ASSERTING_INT_CAST(uint32_t, newH));
+			if (newH > oldH)
+				XFillRectangle(xfc->display, xfc->primary, fillGC,
+				               0, WINPR_ASSERTING_INT_CAST(int, oldH),
+				               WINPR_ASSERTING_INT_CAST(uint32_t, oldW),
+				               WINPR_ASSERTING_INT_CAST(uint32_t, newH - oldH));
 			XFreeGC(xfc->display, fillGC);
 		}
 
