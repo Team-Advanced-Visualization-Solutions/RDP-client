@@ -94,30 +94,28 @@ jobs:
     runs-on: ubuntu-22.04
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
+      - uses: actions/checkout@v4
+
       - name: Download Ubuntu artifact
         uses: actions/download-artifact@v4
         with:
           name: RDP-client-linux-x86_64
-          path: artifacts
+          path: /tmp/artifacts
 
       - name: Download Fedora artifact
         uses: actions/download-artifact@v4
         with:
           name: RDP-client-linux-x86_64-fedora
-          path: artifacts
+          path: /tmp/artifacts
 
       - name: Verify artifacts
-        run: |
-          ls -lh artifacts/*.tar.gz
-          ls -1 artifacts/*.tar.gz > /tmp/files.txt
-
-      - uses: actions/checkout@v4
+        run: ls -lh /tmp/artifacts/*.tar.gz
 
       - name: Create GitHub Release
         run: |
           gh release create "${GITHUB_REF_NAME}" \
             --title "RDP-client ${GITHUB_REF_NAME}" \
             --generate-notes \
-            $(cat /tmp/files.txt)
+            /tmp/artifacts/*.tar.gz
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
