@@ -354,8 +354,6 @@ static BOOL xf_desktop_resize(rdpContext* context)
 	{
 		const BOOL same = (xfc->primary == xfc->drawing);
 		const Pixmap oldPrimary = xfc->primary;
-		const UINT32 oldW = xfc->primaryWidth;
-		const UINT32 oldH = xfc->primaryHeight;
 		const UINT32 newW = freerdp_settings_get_uint32(settings, FreeRDP_DesktopWidth);
 		const UINT32 newH = freerdp_settings_get_uint32(settings, FreeRDP_DesktopHeight);
 
@@ -365,29 +363,23 @@ static BOOL xf_desktop_resize(rdpContext* context)
 		          WINPR_ASSERTING_INT_CAST(uint32_t, xfc->depth))))
 			return FALSE;
 
-		/* Copy old content top-left aligned and fill exposed edges grey.
-		 * This avoids black flash while keeping existing image intact. */
-		XCopyArea(xfc->display, oldPrimary, xfc->primary, xfc->gc,
-		          0, 0, oldW, oldH, 0, 0);
-		if (newW > oldW || newH > oldH)
+		/* The old pixmap content is stale: gdi_resize already created a
+		 * fresh black buffer, so copying the old frame would leave the two
+		 * surfaces out of sync and cause flicker when XPutImage blends
+		 * them.  Just clear the new pixmap to black so primary and the
+		 * GDI buffer start from the same uniform state. */
 		{
 			XGCValues gcv = WINPR_C_ARRAY_INIT;
-			gcv.foreground = XF_BACKGROUND_COLOR;
+			gcv.foreground = BlackPixelOfScreen(xfc->screen);
 			gcv.function = GXcopy;
 			gcv.fill_style = FillSolid;
 			GC fillGC =
 			    XCreateGC(xfc->display, xfc->primary,
 			              GCForeground | GCFunction | GCFillStyle, &gcv);
-			if (newW > oldW)
-				XFillRectangle(xfc->display, xfc->primary, fillGC,
-				               WINPR_ASSERTING_INT_CAST(int, oldW), 0,
-				               WINPR_ASSERTING_INT_CAST(uint32_t, newW - oldW),
-				               WINPR_ASSERTING_INT_CAST(uint32_t, newH));
-			if (newH > oldH)
-				XFillRectangle(xfc->display, xfc->primary, fillGC,
-				               0, WINPR_ASSERTING_INT_CAST(int, oldH),
-				               WINPR_ASSERTING_INT_CAST(uint32_t, oldW),
-				               WINPR_ASSERTING_INT_CAST(uint32_t, newH - oldH));
+			XFillRectangle(xfc->display, xfc->primary, fillGC,
+			               0, 0,
+			               WINPR_ASSERTING_INT_CAST(uint32_t, newW),
+			               WINPR_ASSERTING_INT_CAST(uint32_t, newH));
 			XFreeGC(xfc->display, fillGC);
 		}
 
