@@ -863,32 +863,38 @@ static BOOL xf_event_ConfigureNotify(xfContext* xfc, const XConfigureEvent* even
 
 		if (xfc->window->width != event->width || xfc->window->height != event->height)
 		{
-			const int oldW = xfc->window->width;
-			const int oldH = xfc->window->height;
 			xfc->window->width = event->width;
 			xfc->window->height = event->height;
-			/* When the window grows, X11 may show garbage on the newly-exposed
-			 * pixels.  Fill ONLY the newly-exposed right / bottom strips with
-			 * grey; the old visible area is left intact by the server. */
-			if (event->width > oldW || event->height > oldH)
+			/* If the window grew beyond the primary pixmap we have no data for
+			 * the new pixels — fill those exposed strips with grey so the user
+			 * does not see garbage / wallpaper from underneath.  Otherwise copy
+			 * from the primary pixmap which already holds the latest frame. */
+			if (event->width > WINPR_ASSERTING_INT_CAST(int, xfc->primaryWidth) ||
+			    event->height > WINPR_ASSERTING_INT_CAST(int, xfc->primaryHeight))
 			{
+				const int oldPW = WINPR_ASSERTING_INT_CAST(int, xfc->primaryWidth);
+				const int oldPH = WINPR_ASSERTING_INT_CAST(int, xfc->primaryHeight);
 				XGCValues gcv = WINPR_C_ARRAY_INIT;
 				gcv.foreground = 0x333333; /* XF_BACKGROUND_COLOR */
 				gcv.function = GXcopy;
 				gcv.fill_style = FillSolid;
 				GC fillGC = XCreateGC(xfc->display, xfc->window->handle,
 				                      GCForeground | GCFunction | GCFillStyle, &gcv);
-				if (event->width > oldW)
+				if (event->width > oldPW)
 					XFillRectangle(xfc->display, xfc->window->handle, fillGC,
-					               oldW, 0,
-					               WINPR_ASSERTING_INT_CAST(uint32_t, event->width - oldW),
+					               oldPW, 0,
+					               WINPR_ASSERTING_INT_CAST(uint32_t, event->width - oldPW),
 					               WINPR_ASSERTING_INT_CAST(uint32_t, event->height));
-				if (event->height > oldH)
+				if (event->height > oldPH)
 					XFillRectangle(xfc->display, xfc->window->handle, fillGC,
-					               0, oldH,
-					               WINPR_ASSERTING_INT_CAST(uint32_t, oldW),
-					               WINPR_ASSERTING_INT_CAST(uint32_t, event->height - oldH));
+					               0, oldPH,
+					               WINPR_ASSERTING_INT_CAST(uint32_t, oldPW),
+					               WINPR_ASSERTING_INT_CAST(uint32_t, event->height - oldPH));
 				XFreeGC(xfc->display, fillGC);
+			}
+			else
+			{
+				xf_draw_screen(xfc, 0, 0, event->width, event->height);
 			}
 #ifdef WITH_XRENDER
 			xfc->offset_x = 0;
