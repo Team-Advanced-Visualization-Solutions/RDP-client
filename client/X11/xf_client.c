@@ -448,6 +448,23 @@ static BOOL xf_end_paint(rdpContext* context)
 	rdpGdi* gdi = context->gdi;
 	WINPR_ASSERT(gdi);
 
+	/* Restore original window title once the first frame has arrived
+	 * or the deadline has elapsed (whichever comes first). */
+	if (xfc->window && xfc->window_title_original)
+	{
+		struct timespec ts = WINPR_C_ARRAY_INIT;
+		if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0)
+		{
+			const long long now = (long long)ts.tv_sec * 1000000000LL + ts.tv_nsec;
+			if (now >= xfc->window_title_deadline)
+			{
+				xf_SetWindowTitleText(xfc, xfc->window->handle, xfc->window_title_original);
+				free(xfc->window_title_original);
+				xfc->window_title_original = nullptr;
+			}
+		}
+	}
+
 	if (gdi->suppressOutput)
 		return TRUE;
 
@@ -489,19 +506,6 @@ static BOOL xf_end_paint(rdpContext* context)
 
 	hwnd->invalid->null = TRUE;
 	hwnd->ninvalid = 0;
-
-	/* Restore original window title after progress indicator expires. */
-	if (xfc->window && xfc->window_title_reset_counter > 0)
-	{
-		xfc->window_title_reset_counter--;
-		if (xfc->window_title_reset_counter == 0 && xfc->window_title_original)
-		{
-			xf_SetWindowTitleText(xfc, xfc->window->handle, xfc->window_title_original);
-			free(xfc->window_title_original);
-			xfc->window_title_original = nullptr;
-		}
-	}
-
 	return TRUE;
 }
 
@@ -1332,16 +1336,21 @@ static BOOL xf_post_connect(freerdp* instance)
 		return FALSE;
 
 	/* Show a brief "loading…" progress indicator in the window title.
-	 * It will be restored to the original title after a few paint cycles. */
+	 * It will be restored after ~2 seconds or once the first frame arrives. */
 	if (xfc->window)
 	{
 		char* original = xf_window_get_title(settings);
 		if (original)
 		{
+			struct timespec ts = WINPR_C_ARRAY_INIT;
 			xfc->window_title_original = original;
 			xf_SetWindowTitleText(xfc, xfc->window->handle,
 			                      "RDP-client — загрузка рабочего стола…");
-			xfc->window_title_reset_counter = 60; /* ~1 s at 60 fps */
+			if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0)
+				xfc->window_title_deadline =
+				    (long long)ts.tv_sec * 1000000000LL + ts.tv_nsec + 2000000000LL;
+			else
+				xfc->window_title_deadline = 0;
 		}
 	}
 

@@ -196,7 +196,7 @@ struct xf_context
 
 	/* Original window title, restored after connection progress indicator. */
 	char* window_title_original;
-	int window_title_reset_counter;
+	long long window_title_deadline; /* CLOCK_MONOTONIC ns when to restore title */
 
 	int XInputOpcode;
 
