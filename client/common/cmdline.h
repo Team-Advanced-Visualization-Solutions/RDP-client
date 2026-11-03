@@ -26,71 +26,71 @@
 
 static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 	{ "a", COMMAND_LINE_VALUE_REQUIRED, "<addin>[,<options>]", nullptr, nullptr, -1, "addin",
-	  "Addin" },
+	  "Дополнение" },
 	{ "azure", COMMAND_LINE_VALUE_REQUIRED,
 	  "[tenantid:<id>],[use-tenantid[:[on|off]],[ad:<url>]"
 	  "[avd-access:<format string>],[avd-token:<format string>],[avd-scope:<format string>],"
 	  "[user-agent:<string>],[auth-helper:<path|autodetect>]",
 	  nullptr, nullptr, -1, nullptr, "AzureAD options" },
 	{ "action-script", COMMAND_LINE_VALUE_REQUIRED, "<file-name>", "~/.config/freerdp/action.sh",
-	  nullptr, -1, nullptr, "Action script" },
+	  nullptr, -1, nullptr, "Скрипт действия" },
 	{ "admin", COMMAND_LINE_VALUE_FLAG, nullptr, nullptr, nullptr, -1, "console",
-	  "Admin (or console) session" },
+	  "Сессия администратора" },
 	{ "aero", COMMAND_LINE_VALUE_BOOL, nullptr, nullptr, BoolValueFalse, -1, nullptr,
-	  "desktop composition" },
+	  "композитный рабочий стол (Aero)" },
 	{ "app", COMMAND_LINE_VALUE_REQUIRED,
 	  "program:[<path>|<||alias>],cmd:<command>,file:<filename>,guid:<guid>,icon:<filename>,name:<"
 	  "name>,workdir:<directory>,hidef:[on|off]",
-	  nullptr, nullptr, -1, nullptr, "Remote application program" },
-#if defined(WITH_FREERDP_DEPRECATED_COMMANDLINE)
+	  nullptr, nullptr, -1, nullptr, "Удалённое приложение (RemoteApp)" },
+#if defined(WITH_FREERDP_УСТАРЕВШЕ_COMMANDLINE)
 	{ "app-cmd", COMMAND_LINE_VALUE_REQUIRED, "<parameters>", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /app:cmd:<command>] Remote application command-line parameters" },
+	  "[УСТАРЕВШЕ, use /app:cmd:<command>] Remote application command-line parameters" },
 	{ "app-file", COMMAND_LINE_VALUE_REQUIRED, "<file-name>", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /app:file:<filename>] File to open with remote application" },
+	  "[УСТАРЕВШЕ, use /app:file:<filename>] File to open with remote application" },
 	{ "app-guid", COMMAND_LINE_VALUE_REQUIRED, "<app-guid>", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /app:guid:<guid>] Remote application GUID" },
+	  "[УСТАРЕВШЕ, use /app:guid:<guid>] Remote application GUID" },
 	{ "app-icon", COMMAND_LINE_VALUE_REQUIRED, "<icon-path>", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /app:icon:<filename>] Remote application icon for user interface" },
+	  "[УСТАРЕВШЕ, use /app:icon:<filename>] Remote application icon for user interface" },
 	{ "app-name", COMMAND_LINE_VALUE_REQUIRED, "<app-name>", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /app:name:<name>] Remote application name for user interface" },
+	  "[УСТАРЕВШЕ, use /app:name:<name>] Remote application name for user interface" },
 	{ "app-workdir", COMMAND_LINE_VALUE_REQUIRED, "<workspace path>", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /app:workdir:<directory>] Remote application workspace path" },
+	  "[УСТАРЕВШЕ, use /app:workdir:<directory>] Remote application workspace path" },
 #endif
 	{ "assistance", COMMAND_LINE_VALUE_REQUIRED, "<password>", nullptr, nullptr, -1, nullptr,
-	  "Remote assistance password" },
+	  "Пароль удалённой помощи" },
 	{ "auto-request-control", COMMAND_LINE_VALUE_FLAG, "", nullptr, nullptr, -1, nullptr,
 	  "Automatically request remote assistance input control" },
 	{ "async-channels", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueFalse, nullptr, -1, nullptr,
-	  "Asynchronous channels (experimental)" },
+	  "Асинхронные каналы (экспериментально)" },
 	{ "async-update", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueFalse, nullptr, -1, nullptr,
-	  "Asynchronous update" },
+	  "Асинхронное обновление" },
 	{ "audio-mode", COMMAND_LINE_VALUE_REQUIRED, "[[none|2]|[server|1]|[redirect|0]]", nullptr,
-	  nullptr, -1, nullptr, "Audio output mode" },
+	  nullptr, -1, nullptr, "Режим вывода звука" },
 	{ "auth-only", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueFalse, nullptr, -1, nullptr,
-	  "Authenticate only" },
+	  "Только аутентификация" },
 	{ "auth-pkg-list", COMMAND_LINE_VALUE_REQUIRED, "[[none],]<!ntlm,kerberos,!u2u>", nullptr,
 	  nullptr, -1, nullptr,
 	  "Authentication package filter (comma-separated list, use '!' to disable). By default "
 	  "all methods are enabled. Use explicit 'none' as first argument to disable all methods, "
 	  "selectively enabling only the ones following." },
 	{ "authentication", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueTrue, nullptr, -1, nullptr,
-	  "Authentication (experimental)" },
+	  "Аутентификация (экспериментально)" },
 	{ "auto-reconnect", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueFalse, nullptr, -1, nullptr,
-	  "Automatic reconnection" },
+	  "Автоматическое переподключение" },
 	{ "auto-reconnect-max-retries", COMMAND_LINE_VALUE_REQUIRED, "<retries>", nullptr, nullptr, -1,
-	  nullptr, "Automatic reconnection maximum retries, 0 for unlimited [0,1000]" },
-#if defined(WITH_FREERDP_DEPRECATED_COMMANDLINE)
+	  nullptr, "Макс. попыток переподключения (0=бесконечно)" },
+#if defined(WITH_FREERDP_УСТАРЕВШЕ_COMMANDLINE)
 	{ "bitmap-cache", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueFalse, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /cache:bitmap[:on|off]] bitmap cache" },
+	  "[УСТАРЕВШЕ, use /cache:bitmap[:on|off]] bitmap cache" },
 	{ "persist-cache", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueFalse, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /cache:persist[:on|off]] persistent bitmap cache" },
+	  "[УСТАРЕВШЕ, use /cache:persist[:on|off]] persistent bitmap cache" },
 	{ "persist-cache-file", COMMAND_LINE_VALUE_REQUIRED, "<filename>", nullptr, nullptr, -1,
-	  nullptr, "[DEPRECATED, use /cache:persist-file:<filename>] persistent bitmap cache file" },
+	  nullptr, "[УСТАРЕВШЕ, use /cache:persist-file:<filename>] persistent bitmap cache file" },
 #endif
 	{ "bpp", COMMAND_LINE_VALUE_REQUIRED, "<depth>", "16", nullptr, -1, nullptr,
-	  "Session bpp (color depth)" },
+	  "Глубина цвета (bpp)" },
 	{ "buildconfig", COMMAND_LINE_VALUE_FLAG | COMMAND_LINE_PRINT_BUILDCONFIG, nullptr, nullptr,
-	  nullptr, -1, nullptr, "Print the build configuration" },
+	  nullptr, -1, nullptr, "Вывести конфигурацию сборки" },
 	{ "cache", COMMAND_LINE_VALUE_REQUIRED,
 	  "[bitmap[:on|off],codec[:rfx|nsc],glyph[:on|off],offscreen[:on|off],persist,persist-file:<"
 	  "filename>]",
@@ -109,16 +109,16 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 	  "subsequent connections if the certificate does not match\n"
 	  " * fingerprints ... A list of certificate hashes that are accepted unconditionally for a "
 	  "connection" },
-#if defined(WITH_FREERDP_DEPRECATED_COMMANDLINE)
+#if defined(WITH_FREERDP_УСТАРЕВШЕ_COMMANDLINE)
 	{ "cert-deny", COMMAND_LINE_VALUE_FLAG, nullptr, nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /cert:deny] Automatically abort connection for any certificate that can "
+	  "[УСТАРЕВШЕ, use /cert:deny] Automatically abort connection for any certificate that can "
 	  "not be validated." },
 	{ "cert-ignore", COMMAND_LINE_VALUE_FLAG, nullptr, nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /cert:ignore] Ignore certificate" },
+	  "[УСТАРЕВШЕ, use /cert:ignore] Ignore certificate" },
 	{ "cert-name", COMMAND_LINE_VALUE_REQUIRED, "<name>", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /cert:name:<name>] Certificate name" },
+	  "[УСТАРЕВШЕ, use /cert:name:<name>] Certificate name" },
 	{ "cert-tofu", COMMAND_LINE_VALUE_FLAG, nullptr, nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /cert:tofu] Automatically accept certificate on first connect" },
+	  "[УСТАРЕВШЕ, use /cert:tofu] Automatically accept certificate on first connect" },
 #endif
 #ifdef _WIN32
 	{ "connect-child-session", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueFalse, nullptr, -1, "",
@@ -127,7 +127,7 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 	{ "client-build-number", COMMAND_LINE_VALUE_REQUIRED, "<number>", nullptr, nullptr, -1, nullptr,
 	  "Client Build Number sent to server (influences smartcard behaviour, see [MS-RDPESC])" },
 	{ "client-hostname", COMMAND_LINE_VALUE_REQUIRED, "<name>", nullptr, nullptr, -1, nullptr,
-	  "Client Hostname to send to server" },
+	  "Имя хоста клиента для сервера" },
 	{ "clipboard", COMMAND_LINE_VALUE_BOOL | COMMAND_LINE_VALUE_OPTIONAL,
 	  "[[use-selection:<atom>],[direction-to:[all|local|remote|off]],[files-to[:all|local|remote|"
 	  "off]]]",
@@ -137,9 +137,9 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 	  "CLIPBOARD. PRIMARY is the X-style middle-click selection.\n"
 	  " * direction-to:[all|local|remote|off] control enabled clipboard direction\n"
 	  " * files-to:[all|local|remote|off] control enabled file clipboard direction" },
-#if defined(WITH_FREERDP_DEPRECATED_COMMANDLINE)
+#if defined(WITH_FREERDP_УСТАРЕВШЕ_COMMANDLINE)
 	{ "codec-cache", COMMAND_LINE_VALUE_REQUIRED, "[rfx|nsc|jpeg]", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /cache:codec:[rfx|nsc|jpeg]] Bitmap codec cache" },
+	  "[УСТАРЕВШЕ, use /cache:codec:[rfx|nsc|jpeg]] Bitmap codec cache" },
 #endif
 	{ "compression", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueTrue, nullptr, -1, "z",
 	  "compression" },
@@ -147,7 +147,7 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 	  "Compression level (0,1,2)" },
 	{ "credentials-delegation", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueFalse, nullptr, -1,
 	  nullptr, "credentials delegation" },
-	{ "d", COMMAND_LINE_VALUE_REQUIRED, "<domain>", nullptr, nullptr, -1, nullptr, "Domain" },
+	{ "d", COMMAND_LINE_VALUE_REQUIRED, "<domain>", nullptr, nullptr, -1, nullptr, "Домен" },
 	{ "decorations", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueTrue, nullptr, -1, nullptr,
 	  "Window decorations" },
 	{ "disp", COMMAND_LINE_VALUE_FLAG, nullptr, nullptr, nullptr, -1, nullptr, "Display control" },
@@ -197,13 +197,13 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 	  "token>,type:[rpc|http[,no-websockets][,extauth-sspi-ntlm]|auto[,no-websockets][,extauth-"
 	  "sspi-ntlm]]|arm,url:<wss://url>,bearer:<oauth2-bearer-token>,timeout:<1-600000 ms>",
 	  nullptr, nullptr, -1, "gw", "Gateway Hostname" },
-#if defined(WITH_FREERDP_DEPRECATED_COMMANDLINE)
+#if defined(WITH_FREERDP_УСТАРЕВШЕ_COMMANDLINE)
 	{ "g", COMMAND_LINE_VALUE_REQUIRED, "<gateway>[:<port>]", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /gateway:g:<url>] Gateway Hostname" },
+	  "[УСТАРЕВШЕ, use /gateway:g:<url>] Gateway Hostname" },
 	{ "gateway-usage-method", COMMAND_LINE_VALUE_REQUIRED, "[direct|detect]", nullptr, nullptr, -1,
-	  "gum", "[DEPRECATED, use /gateway:usage-method:<method>] Gateway usage method" },
+	  "gum", "[УСТАРЕВШЕ, use /gateway:usage-method:<method>] Gateway usage method" },
 	{ "gd", COMMAND_LINE_VALUE_REQUIRED, "<domain>", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /gateway:d:<domain>] Gateway domain" },
+	  "[УСТАРЕВШЕ, use /gateway:d:<domain>] Gateway domain" },
 #endif
 	{ "gdi", COMMAND_LINE_VALUE_REQUIRED, "sw|hw", nullptr, nullptr, -1, nullptr, "GDI rendering" },
 	{ "geometry", COMMAND_LINE_VALUE_FLAG, nullptr, nullptr, nullptr, -1, nullptr,
@@ -220,9 +220,9 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 #endif
 	  ,
 	  nullptr, nullptr, -1, nullptr, "RDP8 graphics pipeline" },
-#if defined(WITH_FREERDP_DEPRECATED_COMMANDLINE)
+#if defined(WITH_FREERDP_УСТАРЕВШЕ_COMMANDLINE)
 	{ "gfx-h264", COMMAND_LINE_VALUE_OPTIONAL, "[[AVC420|AVC444],mask:<value>]", nullptr, nullptr,
-	  -1, nullptr, "[DEPRECATED, use /gfx:avc420] RDP8.1 graphics pipeline using H264 codec" },
+	  -1, nullptr, "[УСТАРЕВШЕ, use /gfx:avc420] RDP8.1 graphics pipeline using H264 codec" },
 #endif
 #else
 	{ "gfx", COMMAND_LINE_VALUE_OPTIONAL,
@@ -230,33 +230,33 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 	  ":on|off],thin-client[:on|off],progressive[:on|off]]",
 	  nullptr, nullptr, -1, nullptr, "RDP8 graphics pipeline" },
 #endif
-#if defined(WITH_FREERDP_DEPRECATED_COMMANDLINE)
+#if defined(WITH_FREERDP_УСТАРЕВШЕ_COMMANDLINE)
 	{ "gfx-progressive", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueFalse, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /gfx:progressive] RDP8 graphics pipeline using progressive codec" },
+	  "[УСТАРЕВШЕ, use /gfx:progressive] RDP8 graphics pipeline using progressive codec" },
 	{ "gfx-small-cache", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueTrue, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /gfx:small-cache] RDP8 graphics pipeline using small cache mode" },
+	  "[УСТАРЕВШЕ, use /gfx:small-cache] RDP8 graphics pipeline using small cache mode" },
 	{ "gfx-thin-client", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueFalse, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /gfx:thin-client] RDP8 graphics pipeline using thin client mode" },
+	  "[УСТАРЕВШЕ, use /gfx:thin-client] RDP8 graphics pipeline using thin client mode" },
 	{ "glyph-cache", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueFalse, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /cache:glyph[:on|off]] Glyph cache (experimental)" },
+	  "[УСТАРЕВШЕ, use /cache:glyph[:on|off]] Glyph cache (experimental)" },
 #endif
-#if defined(WITH_FREERDP_DEPRECATED_COMMANDLINE)
+#if defined(WITH_FREERDP_УСТАРЕВШЕ_COMMANDLINE)
 	{ "gp", COMMAND_LINE_VALUE_REQUIRED, "<password>", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /gateway:p:<password>] Gateway password" },
+	  "[УСТАРЕВШЕ, use /gateway:p:<password>] Gateway password" },
 #endif
 	{ "grab-keyboard", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueTrue, nullptr, -1, nullptr,
 	  "Grab keyboard focus, forward all keys to remote" },
 	{ "grab-mouse", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueTrue, nullptr, -1, nullptr,
 	  "Grab mouse focus, forward all events to remote" },
-#if defined(WITH_FREERDP_DEPRECATED_COMMANDLINE)
+#if defined(WITH_FREERDP_УСТАРЕВШЕ_COMMANDLINE)
 	{ "gt", COMMAND_LINE_VALUE_REQUIRED,
 	  "[rpc|http[,no-websockets][,extauth-sspi-ntlm]|auto[,no-websockets][,extauth-sspi-ntlm]]",
 	  nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /gateway:type:<type>] Gateway transport type" },
+	  "[УСТАРЕВШЕ, use /gateway:type:<type>] Gateway transport type" },
 	{ "gu", COMMAND_LINE_VALUE_REQUIRED, "[[<domain>\\]<user>|<user>[@<domain>]]", nullptr, nullptr,
-	  -1, nullptr, "[DEPRECATED, use /gateway:u:<user>] Gateway username" },
+	  -1, nullptr, "[УСТАРЕВШЕ, use /gateway:u:<user>] Gateway username" },
 	{ "gat", COMMAND_LINE_VALUE_REQUIRED, "<access token>", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /gateway:access-token:<token>] Gateway Access Token" },
+	  "[УСТАРЕВШЕ, use /gateway:access-token:<token>] Gateway Access Token" },
 #endif
 	{ "h", COMMAND_LINE_VALUE_REQUIRED, "<height>", "768", nullptr, -1, nullptr, "Height" },
 	{ "heartbeat", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueTrue, nullptr, -1, nullptr,
@@ -287,26 +287,26 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 	  "To switch "
 	  "'a' and 's' on a US keyboard: /kbd:remap:0x1e=0x1f,remap:0x1f=0x1e\n"
 	  " * pipe: Name of a named pipe that can be used to type text into the RDP session\n" },
-#if defined(WITH_FREERDP_DEPRECATED_COMMANDLINE)
+#if defined(WITH_FREERDP_УСТАРЕВШЕ_COMMANDLINE)
 	{ "kbd-lang", COMMAND_LINE_VALUE_REQUIRED, "0x<id>", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use / kbd:lang:<value>] Keyboard active language identifier" },
+	  "[УСТАРЕВШЕ, use / kbd:lang:<value>] Keyboard active language identifier" },
 	{ "kbd-fn-key", COMMAND_LINE_VALUE_REQUIRED, "<value>", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /kbd:fn-key:<value>] Function key value" },
+	  "[УСТАРЕВШЕ, use /kbd:fn-key:<value>] Function key value" },
 	{ "kbd-list", COMMAND_LINE_VALUE_FLAG | COMMAND_LINE_PRINT, nullptr, nullptr, nullptr, -1,
-	  nullptr, "[DEPRECATED, use /list:kbd] List keyboard layouts" },
+	  nullptr, "[УСТАРЕВШЕ, use /list:kbd] List keyboard layouts" },
 	{ "kbd-scancode-list", COMMAND_LINE_VALUE_FLAG | COMMAND_LINE_PRINT, nullptr, nullptr, nullptr,
-	  -1, nullptr, "[DEPRECATED, use list:kbd-scancode] List keyboard RDP scancodes" },
+	  -1, nullptr, "[УСТАРЕВШЕ, use list:kbd-scancode] List keyboard RDP scancodes" },
 	{ "kbd-lang-list", COMMAND_LINE_VALUE_OPTIONAL | COMMAND_LINE_PRINT, nullptr, nullptr, nullptr,
-	  -1, nullptr, "[DEPRECATED, use /list:kbd-lang] List keyboard languages" },
+	  -1, nullptr, "[УСТАРЕВШЕ, use /list:kbd-lang] List keyboard languages" },
 	{ "kbd-remap", COMMAND_LINE_VALUE_REQUIRED,
-	  "[DEPRECATED, use /kbd:remap] List of <key>=<value>,... pairs to remap scancodes", nullptr,
+	  "[УСТАРЕВШЕ, use /kbd:remap] List of <key>=<value>,... pairs to remap scancodes", nullptr,
 	  nullptr, -1, nullptr, "Keyboard scancode remapping" },
 	{ "kbd-subtype", COMMAND_LINE_VALUE_REQUIRED, "<id>", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /kbd:subtype]Keyboard subtype" },
+	  "[УСТАРЕВШЕ, use /kbd:subtype]Keyboard subtype" },
 	{ "kbd-type", COMMAND_LINE_VALUE_REQUIRED, "<id>", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /kbd:type] Keyboard type" },
+	  "[УСТАРЕВШЕ, use /kbd:type] Keyboard type" },
 	{ "kbd-unicode", COMMAND_LINE_VALUE_FLAG, "", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /kbd:unicode[:on|off]] Send unicode symbols, e.g. use the local "
+	  "[УСТАРЕВШЕ, use /kbd:unicode[:on|off]] Send unicode symbols, e.g. use the local "
 	  "keyboard map. ATTENTION: Does not work with every "
 	  "RDP server!" },
 #endif
@@ -335,11 +335,11 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 	{ "microphone", COMMAND_LINE_VALUE_OPTIONAL,
 	  "[sys:<sys>,][dev:<dev>,][format:<format>,][rate:<rate>,][channel:<channel>]", nullptr,
 	  nullptr, -1, "mic", "Audio input (microphone)" },
-#if defined(WITH_FREERDP_DEPRECATED_COMMANDLINE)
+#if defined(WITH_FREERDP_УСТАРЕВШЕ_COMMANDLINE)
 	{ "smartcard-list", COMMAND_LINE_VALUE_FLAG | COMMAND_LINE_PRINT, nullptr, nullptr, nullptr, -1,
-	  nullptr, "[DEPRECATED, use /list:smartcard] List smartcard information" },
+	  nullptr, "[УСТАРЕВШЕ, use /list:smartcard] List smartcard information" },
 	{ "monitor-list", COMMAND_LINE_VALUE_FLAG | COMMAND_LINE_PRINT, nullptr, nullptr, nullptr, -1,
-	  nullptr, "[DEPRECATED, use /list:monitor] List detected monitors" },
+	  nullptr, "[УСТАРЕВШЕ, use /list:monitor] List detected monitors" },
 #endif
 	{ "monitors", COMMAND_LINE_VALUE_REQUIRED, "<id>[,<id>[,...]]", nullptr, nullptr, -1, nullptr,
 	  "[experimental] Select monitors to use (only effective in fullscreen or multimonitor mode)" },
@@ -354,7 +354,7 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 	  " * grab:       grab the mouse if within the window" },
 #if defined(CHANNEL_TSMF_CLIENT)
 	{ "multimedia", COMMAND_LINE_VALUE_OPTIONAL, "[sys:<sys>,][dev:<dev>,][decoder:<decoder>]",
-	  nullptr, nullptr, -1, "mmr", "[DEPRECATED], use /video] Redirect multimedia (video)" },
+	  nullptr, nullptr, -1, "mmr", "[УСТАРЕВШЕ], use /video] Redirect multimedia (video)" },
 #endif
 	{ "multimon", COMMAND_LINE_VALUE_BOOL | COMMAND_LINE_VALUE_OPTIONAL, "on|off|force",
 	  BoolValueFalse, nullptr, -1, nullptr, "Use multiple monitors" },
@@ -374,11 +374,11 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 	  "protocol security negotiation" },
 	{ "network", COMMAND_LINE_VALUE_REQUIRED,
 	  "[invalid|modem|broadband|broadband-low|broadband-high|wan|lan|auto]", nullptr, nullptr, -1,
-	  nullptr, "Network connection type" },
+	  nullptr, "Тип сетевого подключения" },
 	{ "nsc", COMMAND_LINE_VALUE_FLAG, nullptr, nullptr, nullptr, -1, "nscodec", "NSCodec support" },
-#if defined(WITH_FREERDP_DEPRECATED_COMMANDLINE)
+#if defined(WITH_FREERDP_УСТАРЕВШЕ_COMMANDLINE)
 	{ "offscreen-cache", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueFalse, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /cache:offscreen[:on|off]] offscreen bitmap cache" },
+	  "[УСТАРЕВШЕ, use /cache:offscreen[:on|off]] offscreen bitmap cache" },
 #endif
 	{ "orientation", COMMAND_LINE_VALUE_REQUIRED, "[0|90|180|270]", nullptr, nullptr, -1, nullptr,
 	  "Orientation of display in degrees" },
@@ -417,7 +417,7 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 	  "Pass the hash (restricted admin mode)" },
 	{ "pwidth", COMMAND_LINE_VALUE_REQUIRED, "<width>", nullptr, nullptr, -1, nullptr,
 	  "Physical width of display (in millimeters)" },
-#if !defined(WITHOUT_FREERDP_3x_DEPRECATED)
+#if !defined(WITHOUT_FREERDP_3x_УСТАРЕВШЕ)
 	{ "rdp2tcp", COMMAND_LINE_VALUE_REQUIRED, "<executable path[:arg...]>", nullptr, nullptr, -1,
 	  nullptr, "TCP redirection" },
 #endif
@@ -449,15 +449,15 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 	  nullptr, -1, nullptr,
 	  "Force specific protocol security. e.g. /sec:nla enables NLA and disables all others, while "
 	  "/sec:nla:[on|off] just toggles NLA" },
-#if defined(WITH_FREERDP_DEPRECATED_COMMANDLINE)
+#if defined(WITH_FREERDP_УСТАРЕВШЕ_COMMANDLINE)
 	{ "sec-ext", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueTrue, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /sec:ext] NLA extended protocol security" },
+	  "[УСТАРЕВШЕ, use /sec:ext] NLA extended protocol security" },
 	{ "sec-nla", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueTrue, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /sec:nla] NLA protocol security" },
+	  "[УСТАРЕВШЕ, use /sec:nla] NLA protocol security" },
 	{ "sec-rdp", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueTrue, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /sec:rdp] RDP protocol security" },
+	  "[УСТАРЕВШЕ, use /sec:rdp] RDP protocol security" },
 	{ "sec-tls", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueTrue, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /sec:tls] TLS protocol security" },
+	  "[УСТАРЕВШЕ, use /sec:tls] TLS protocol security" },
 #endif
 #if defined(CHANNEL_SERIAL_CLIENT)
 	{ "serial", COMMAND_LINE_VALUE_OPTIONAL, "<name>[,<path>[,<driver>[,permissive]]]", nullptr,
@@ -466,9 +466,9 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 	{ "server-name", COMMAND_LINE_VALUE_REQUIRED, "<name>", nullptr, nullptr, -1, nullptr,
 	  "User-specified server name to use for validation (TLS, Kerberos)" },
 	{ "shell", COMMAND_LINE_VALUE_REQUIRED, "<shell>", nullptr, nullptr, -1, nullptr,
-	  "Alternate shell" },
+	  "Альтернативная оболочка" },
 	{ "shell-dir", COMMAND_LINE_VALUE_REQUIRED, "<dir>", nullptr, nullptr, -1, nullptr,
-	  "Shell working directory" },
+	  "Рабочий каталог оболочки" },
 	{ "size", COMMAND_LINE_VALUE_REQUIRED, "<width>x<height> or <percent>%[wh]", "1024x768",
 	  nullptr, -1, nullptr, "Screen size" },
 	{ "smart-sizing", COMMAND_LINE_VALUE_BOOL | COMMAND_LINE_VALUE_OPTIONAL,
@@ -520,16 +520,16 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 	  "servers have a buggy TLS "
 	  "version negotiation and might fail without this. Defaults to TLS 1.2 if no argument is "
 	  "supplied. Use 1.0 for windows 7" },
-#if defined(WITH_FREERDP_DEPRECATED_COMMANDLINE)
+#if defined(WITH_FREERDP_УСТАРЕВШЕ_COMMANDLINE)
 	{ "tls-ciphers", COMMAND_LINE_VALUE_REQUIRED, "[netmon|ma|ciphers]", nullptr, nullptr, -1,
-	  nullptr, "[DEPRECATED, use /tls:ciphers] Allowed TLS ciphers" },
+	  nullptr, "[УСТАРЕВШЕ, use /tls:ciphers] Allowed TLS ciphers" },
 	{ "tls-seclevel", COMMAND_LINE_VALUE_REQUIRED, "<level>", "1", nullptr, -1, nullptr,
-	  "[DEPRECATED, use /tls:seclevel] TLS security level - defaults to 1" },
+	  "[УСТАРЕВШЕ, use /tls:seclevel] TLS security level - defaults to 1" },
 	{ "tls-secrets-file", COMMAND_LINE_VALUE_REQUIRED, "<filename>", nullptr, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /tls:secrets:file] File were TLS secrets will be stored in the "
+	  "[УСТАРЕВШЕ, use /tls:secrets:file] File were TLS secrets will be stored in the "
 	  "SSLKEYLOGFILE format" },
 	{ "enforce-tlsv1_2", COMMAND_LINE_VALUE_BOOL, nullptr, BoolValueFalse, nullptr, -1, nullptr,
-	  "[DEPRECATED, use /tls:enforce:1.2] Force use of TLS1.2 for connection. Some "
+	  "[УСТАРЕВШЕ, use /tls:enforce:1.2] Force use of TLS1.2 for connection. Some "
 	  "servers have a buggy TLS version negotiation and "
 	  "might fail without this" },
 #endif
@@ -537,9 +537,9 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 	  "Alt+Ctrl+Enter to toggle fullscreen" },
 	{ "tune", COMMAND_LINE_VALUE_REQUIRED, "<setting:value>,<setting:value>", "", nullptr, -1,
 	  nullptr, "[experimental] directly manipulate freerdp settings, use with extreme caution!" },
-#if defined(WITH_FREERDP_DEPRECATED_COMMANDLINE)
+#if defined(WITH_FREERDP_УСТАРЕВШЕ_COMMANDLINE)
 	{ "tune-list", COMMAND_LINE_VALUE_FLAG | COMMAND_LINE_PRINT, nullptr, nullptr, nullptr, -1,
-	  nullptr, "[DEPRECATED, use /list:tune] Print options allowed for /tune" },
+	  nullptr, "[УСТАРЕВШЕ, use /list:tune] Print options allowed for /tune" },
 #endif
 	{ "u", COMMAND_LINE_VALUE_REQUIRED, "[[<domain>\\]<user>|<user>[@<domain>]]", nullptr, nullptr,
 	  -1, nullptr, "Username" },
@@ -548,7 +548,7 @@ static const COMMAND_LINE_ARGUMENT_A global_cmd_args[] = {
 #ifdef CHANNEL_URBDRC_CLIENT
 	{ "usb", COMMAND_LINE_VALUE_REQUIRED,
 	  "[dbg,][id:<vid>:<pid>#...,][addr:<bus>:<addr>#...,][auto,][filter:<class>#...|none]",
-	  nullptr, nullptr, -1, nullptr, "Redirect USB device" },
+	  nullptr, nullptr, -1, nullptr, "Перенаправление USB-устройства" },
 #endif
 	{ "v", COMMAND_LINE_VALUE_REQUIRED, "<server>[:port]", nullptr, nullptr, -1, nullptr,
 	  "Server hostname|URL|IPv4|IPv6 or vsock://<number> or /some/path/to/pipe or |:1234 to pass a "
