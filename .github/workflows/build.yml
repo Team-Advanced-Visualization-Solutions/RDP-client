@@ -61,7 +61,7 @@ jobs:
             libX11-devel libXext-devel libXcursor-devel libXrender-devel \
             libXfixes-devel libXi-devel libXrandr-devel libXdamage-devel \
             libXinerama-devel libXv-devel \
-            pulseaudio-libs-devel cups-devel fuse3-devel ffmpeg-devel
+            pulseaudio-libs-devel cups-devel fuse3-devel ffmpeg-free-devel
 
       - uses: actions/checkout@v4
 
