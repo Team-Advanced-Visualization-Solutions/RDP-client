@@ -98,16 +98,16 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: RDP-client-linux-x86_64
-          path: .
+          path: artifacts
 
       - name: Download Fedora artifact
         uses: actions/download-artifact@v4
         with:
           name: RDP-client-linux-x86_64-fedora
-          path: .
+          path: artifacts
 
       - name: Verify artifacts
-        run: ls -lh *.tar.gz
+        run: ls -lh artifacts/*.tar.gz
 
       - uses: actions/checkout@v4
 
@@ -116,7 +116,6 @@ jobs:
           gh release create "${GITHUB_REF_NAME}" \
             --title "RDP-client ${GITHUB_REF_NAME}" \
             --generate-notes \
-            RDP-client-linux-x86_64.tar.gz \
-            RDP-client-linux-x86_64-fedora.tar.gz
+            artifacts/*.tar.gz
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
