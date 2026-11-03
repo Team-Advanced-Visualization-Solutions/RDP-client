@@ -109,6 +109,8 @@ jobs:
       - name: Verify artifacts
         run: ls -lh *.tar.gz
 
+      - uses: actions/checkout@v4
+
       - name: Create GitHub Release
         run: |
           gh release create "${GITHUB_REF_NAME}" \
