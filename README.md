@@ -20,63 +20,23 @@ RDP-client — упрощённый форк FreeRDP, из которого уд
 - **Тёмно-серый фон** — `#333333` вместо чёрного при загрузке
 - **Антифликер ресайз** — плавное изменение размера окна
 
-## Системные требования
+## Установка
 
-- CMake ≥ 3.13
-- C-компилятор (GCC или Clang)
-- OpenSSL ≥ 1.1.1
-- X11 development libraries (`libX11-devel`, `libXext-devel`, `libXcursor-devel`, `libXrender-devel`, `libXfixes-devel`, `libXi-devel`, `libXrandr-devel`)
-- Опционально: FFmpeg, PulseAudio/ALSA, libusb-1.0, libcups, FUSE3
+Полная инструкция по сборке и установке — в файле **[INSTALL.md](INSTALL.md)**.
 
-## Быстрая сборка
+Кратко:
 
 ```bash
+git clone ssh://git@api.gitflame.rt.ru:443/team-advanced-visualization-solutions/RDP-client.git
+cd RDP-client
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . -j$(nproc)
-```
-
-### Результат (в каталоге build)
-
-```
-client/X11/rdp-client           # главный бинарник
-client/common/librdp-client-base.so
-libfreerdp/librdp-core.so
-winpr/libwinpr/librdp-winpr.so
-```
-
-## Установка (в /opt/RDP-client)
-
-По умолчанию проект устанавливается в `/opt/RDP-client`, чтобы не конфликтовать с системным FreeRDP. Бинарник несёт правильный `RPATH` (`$ORIGIN/../lib64`), поэтому `LD_LIBRARY_PATH` не нужен — библиотеки находятся автоматически.
-
-```bash
-cd build
 sudo cmake --install .
+sudo ln -sf /opt/RDP-client/bin/rdp-client /usr/local/bin/rdp-client
 ```
 
-После установки:
-
-```bash
-/opt/RDP-client/bin/rdp-client --version
-```
-
-Добавьте в PATH:
-
-```bash
-export PATH="/opt/RDP-client/bin:$PATH"
-```
-
-Или создайте symlink:
-
-```bash
-sudo ln -s /opt/RDP-client/bin/rdp-client /usr/local/bin/rdp-client
-```
-
-Staging для упаковки:
-
-```bash
-cmake --install . --prefix /tmp/staging/opt/RDP-client
-```
+По умолчанию устанавливается в `/opt/RDP-client`, чтобы не конфликтовать с системным FreeRDP. Бинарник несёт правильный `RPATH` (`$ORIGIN/../lib64`), `LD_LIBRARY_PATH` не нужен.
 
 ## Использование
 
@@ -130,9 +90,10 @@ rdp-client /v:server /u:user /w:1920 /h:1080 /gfx
 
 ```
 RDP-client/
-├── README.md                   # этот файл
-├── CMakeLists.txt              # project(RDP-client)
+├── README.md                   # описание проекта
+├── INSTALL.md                  # инструкция по сборке и установке
 ├── INSTALL.sh                  # скрипт установки
+├── CMakeLists.txt              # project(RDP-client)
 ├── client/
 │   ├── common/                 # librdp-client-base.so — общая логика клиента
 │   └── X11/                    # rdp-client — X11-фронтенд
