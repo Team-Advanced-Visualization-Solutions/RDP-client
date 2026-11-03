@@ -27,7 +27,7 @@ jobs:
             libxinerama-dev libxv-dev \
             libpulse-dev libcups2-dev libfuse3-dev \
             libavcodec-dev libavformat-dev libavutil-dev libswscale-dev \
-            libicu-dev
+            libicu-dev libkrb5-dev liburiparser-dev
 
       - name: Configure
         run: |
@@ -63,7 +63,7 @@ jobs:
             libXfixes-devel libXi-devel libXrandr-devel libXdamage-devel \
             libXinerama-devel libXv-devel \
             pulseaudio-libs-devel cups-devel fuse3-devel ffmpeg-free-devel \
-            libicu-devel
+            libicu-devel krb5-devel uriparser-devel
 
       - uses: actions/checkout@v4
 
