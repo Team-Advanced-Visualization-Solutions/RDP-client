@@ -1574,17 +1574,14 @@ static DWORD WINAPI xf_client_thread(LPVOID param)
 			break;
 
 		/* Keep-alive: emulate user activity so the remote session does not
-		 * idle-lock.  We send a tiny mouse movement (primary) and a keyboard
-		 * key tap (fallback) because different Windows configurations detect
-		 * activity in different ways — some only react to mouse moves, others
-		 * to keyboard input.
+		 * idle-lock.  We send a mouse-move event (PTR_FLAGS_MOVE) at the last
+		 * known cursor position.  The coordinates do not change, so the cursor
+		 * stays visually in place, but the event still counts as fresh input
+		 * and resets the server's idle timer (GetLastInputInfo).
 		 *
-		 * Mouse: cursor is shifted 1 px at the top-left corner (1,1) and
-		 * immediately restored.  This corner is always empty space, so the
-		 * nudge is visually imperceptible and never triggers UI elements.
-		 *
-		 * Keyboard: F15 press+release — a phantom key with no physical
-		 * counterpart and no default bindings in any application. */
+		 * The previous approach (mouse without flags + F15) failed because
+		 * pointerFlags=0 is ignored by Windows, and F15 is not recognised on
+		 * many server keyboard layouts. */
 		if (xfc->keepalive)
 		{
 			struct timespec ts;
@@ -1595,18 +1592,21 @@ static DWORD WINAPI xf_client_thread(LPVOID param)
 				    (long long)xfc->keepalive_interval * 1000000000LL)
 				{
 					xfc->keepalive_last_nudge = now;
-					WLog_DBG(TAG, "keepalive: sending nudge (mouse + keyboard)");
 
 					rdpInput* input = xfc->common.context.input;
 
-					/* Mouse nudge: (1,1) → (2,1) → (1,1). */
-					freerdp_input_send_mouse_event(input, 0, 1, 1);
-					freerdp_input_send_mouse_event(input, 0, 2, 1);
-					freerdp_input_send_mouse_event(input, 0, 1, 1);
-
-					/* Keyboard fallback: F15 tap. */
-					freerdp_input_send_keyboard_event_ex(input, TRUE,  FALSE, RDP_SCANCODE_F15);
-					freerdp_input_send_keyboard_event_ex(input, FALSE, FALSE, RDP_SCANCODE_F15);
+					if (xfc->common.lastX > 0 || xfc->common.lastY > 0)
+					{
+						WLog_DBG(TAG, "keepalive: PTR_FLAGS_MOVE at %dx%d",
+						         xfc->common.lastX, xfc->common.lastY);
+						freerdp_input_send_mouse_event(input, PTR_FLAGS_MOVE,
+						                                (UINT16)xfc->common.lastX,
+						                                (UINT16)xfc->common.lastY);
+					}
+					else
+					{
+						WLog_DBG(TAG, "keepalive: cursor position unknown, skipped");
+					}
 				}
 			}
 		}
