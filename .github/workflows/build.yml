@@ -26,7 +26,8 @@ jobs:
             libxfixes-dev libxi-dev libxrandr-dev libxdamage-dev \
             libxinerama-dev libxv-dev \
             libpulse-dev libcups2-dev libfuse3-dev \
-            libavcodec-dev libavformat-dev libavutil-dev libswscale-dev
+            libavcodec-dev libavformat-dev libavutil-dev libswscale-dev \
+            libicu-dev
 
       - name: Configure
         run: |
@@ -61,7 +62,8 @@ jobs:
             libX11-devel libXext-devel libXcursor-devel libXrender-devel \
             libXfixes-devel libXi-devel libXrandr-devel libXdamage-devel \
             libXinerama-devel libXv-devel \
-            pulseaudio-libs-devel cups-devel fuse3-devel ffmpeg-free-devel
+            pulseaudio-libs-devel cups-devel fuse3-devel ffmpeg-free-devel \
+            libicu-devel
 
       - uses: actions/checkout@v4
 
