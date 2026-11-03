@@ -41,7 +41,7 @@ sudo apt install cmake build-essential libssl-dev \
 ## Быстрая установка (последняя версия из main)
 
 ```bash
-git clone ssh://git@api.gitflame.rt.ru:443/team-advanced-visualization-solutions/RDP-client.git
+git clone git@github.com:Team-Advanced-Visualization-Solutions/RDP-client.git
 cd RDP-client
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
@@ -55,7 +55,7 @@ sudo ln -sf /opt/RDP-client/bin/rdp-client /usr/local/bin/rdp-client
 ## Установка конкретного релиза
 
 ```bash
-git clone ssh://git@api.gitflame.rt.ru:443/team-advanced-visualization-solutions/RDP-client.git
+git clone git@github.com:Team-Advanced-Visualization-Solutions/RDP-client.git
 cd RDP-client
 git checkout v1.0.0          # <-- конкретная версия
 mkdir build && cd build

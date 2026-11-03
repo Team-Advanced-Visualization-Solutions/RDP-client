@@ -27,7 +27,7 @@ RDP-client — упрощённый форк FreeRDP, из которого уд
 Кратко:
 
 ```bash
-git clone ssh://git@api.gitflame.rt.ru:443/team-advanced-visualization-solutions/RDP-client.git
+git clone git@github.com:Team-Advanced-Visualization-Solutions/RDP-client.git
 cd RDP-client
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
