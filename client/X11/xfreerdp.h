@@ -152,6 +152,8 @@ struct xf_context
 	Screen* screen;
 	XImage* image;
 	Pixmap primary;
+	UINT32 primaryWidth;
+	UINT32 primaryHeight;
 	Pixmap drawing;
 	Visual* visual;
 	Display* display;

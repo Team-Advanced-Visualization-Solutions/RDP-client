@@ -352,19 +352,55 @@ static BOOL xf_desktop_resize(rdpContext* context)
 
 	if (xfc->primary)
 	{
-		BOOL same = (xfc->primary == xfc->drawing);
-		LogDynAndXFreePixmap(xfc->log, xfc->display, xfc->primary);
+		const BOOL same = (xfc->primary == xfc->drawing);
+		const Pixmap oldPrimary = xfc->primary;
+		const UINT32 oldW = xfc->primaryWidth;
+		const UINT32 oldH = xfc->primaryHeight;
+		const UINT32 newW = freerdp_settings_get_uint32(settings, FreeRDP_DesktopWidth);
+		const UINT32 newH = freerdp_settings_get_uint32(settings, FreeRDP_DesktopHeight);
 
 		WINPR_ASSERT(xfc->depth != 0);
 		if (!(xfc->primary = LogDynAndXCreatePixmap(
-		          xfc->log, xfc->display, xfc->drawable,
-		          freerdp_settings_get_uint32(settings, FreeRDP_DesktopWidth),
-		          freerdp_settings_get_uint32(settings, FreeRDP_DesktopHeight),
+		          xfc->log, xfc->display, xfc->drawable, newW, newH,
 		          WINPR_ASSERTING_INT_CAST(uint32_t, xfc->depth))))
 			return FALSE;
 
+		/* Copy the old pixmap content into the new one (top-left aligned).
+		 * This avoids the black-flash while we wait for the server
+		 * to send a full repaint for the new resolution. */
+		XCopyArea(xfc->display, oldPrimary, xfc->primary, xfc->gc,
+		          0, 0, oldW, oldH, 0, 0);
+
+		/* Fill any newly-exposed areas with the neutral background colour
+		 * rather than leaving them black / containing garbage. */
+		if (newW > oldW || newH > oldH)
+		{
+			XGCValues gcv = WINPR_C_ARRAY_INIT;
+			gcv.foreground = XF_BACKGROUND_COLOR;
+			gcv.function = GXcopy;
+			gcv.fill_style = FillSolid;
+			GC fillGC =
+			    XCreateGC(xfc->display, xfc->primary,
+			              GCForeground | GCFunction | GCFillStyle, &gcv);
+			if (newW > oldW)
+				XFillRectangle(xfc->display, xfc->primary, fillGC,
+				               WINPR_ASSERTING_INT_CAST(int, oldW), 0,
+				               WINPR_ASSERTING_INT_CAST(unsigned int, newW - oldW),
+				               WINPR_ASSERTING_INT_CAST(unsigned int, newH));
+			if (newH > oldH)
+				XFillRectangle(xfc->display, xfc->primary, fillGC,
+				               0, WINPR_ASSERTING_INT_CAST(int, oldH),
+				               WINPR_ASSERTING_INT_CAST(unsigned int, oldW),
+				               WINPR_ASSERTING_INT_CAST(unsigned int, newH - oldH));
+			XFreeGC(xfc->display, fillGC);
+		}
+
 		if (same)
 			xfc->drawing = xfc->primary;
+
+		LogDynAndXFreePixmap(xfc->log, xfc->display, oldPrimary);
+		xfc->primaryWidth = newW;
+		xfc->primaryHeight = newH;
 	}
 
 #ifdef WITH_XRENDER
@@ -752,6 +788,8 @@ BOOL xf_create_window(xfContext* xfc)
 		                           freerdp_settings_get_uint32(settings, FreeRDP_DesktopHeight),
 		                           WINPR_ASSERTING_INT_CAST(uint32_t, xfc->depth));
 
+	xfc->primaryWidth = freerdp_settings_get_uint32(settings, FreeRDP_DesktopWidth);
+	xfc->primaryHeight = freerdp_settings_get_uint32(settings, FreeRDP_DesktopHeight);
 	xfc->drawing = xfc->primary;
 
 	if (!xfc->bitmap_mono)
