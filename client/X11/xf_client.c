@@ -437,7 +437,7 @@ static BOOL xf_desktop_resize(rdpContext* context)
 
 		LogDynAndXSetFunction(xfc->log, xfc->display, xfc->gc, GXcopy);
 		LogDynAndXSetFillStyle(xfc->log, xfc->display, xfc->gc, FillSolid);
-		LogDynAndXSetForeground(xfc->log, xfc->display, xfc->gc, 0);
+		LogDynAndXSetForeground(xfc->log, xfc->display, xfc->gc, XF_BACKGROUND_COLOR);
 		LogDynAndXFillRectangle(xfc->log, xfc->display, xfc->drawable, xfc->gc, 0, 0,
 		                        freerdp_settings_get_uint32(settings, FreeRDP_DesktopWidth),
 		                        freerdp_settings_get_uint32(settings, FreeRDP_DesktopHeight));
@@ -513,6 +513,7 @@ static BOOL xf_end_paint(rdpContext* context)
 		xf_lock_x11(xfc);
 		if (!xf_paint(xfc, rgn))
 			return FALSE;
+		LogDynAndXFlush(xfc->log, xfc->display);
 		xf_unlock_x11(xfc);
 	}
 	else
