@@ -865,10 +865,22 @@ static BOOL xf_event_ConfigureNotify(xfContext* xfc, const XConfigureEvent* even
 		{
 			xfc->window->width = event->width;
 			xfc->window->height = event->height;
-			/* Redraw immediately so newly-exposed areas show the calm grey
-			 * background from the primary pixmap instead of garbage / desktop
-			 * wallpaper leaking through. */
-			xf_draw_screen(xfc, 0, 0, event->width, event->height);
+			/* When the window grows, newly-exposed pixels show garbage or
+			 * desktop wallpaper.  Paint the *entire* window with our calm
+			 * grey so nothing leaks through while waiting for the server. */
+			{
+				XGCValues gcv = WINPR_C_ARRAY_INIT;
+				gcv.foreground = 0x333333; /* XF_BACKGROUND_COLOR */
+				gcv.function = GXcopy;
+				gcv.fill_style = FillSolid;
+				GC fillGC = XCreateGC(xfc->display, xfc->window->handle,
+				                      GCForeground | GCFunction | GCFillStyle, &gcv);
+				XFillRectangle(xfc->display, xfc->window->handle, fillGC,
+				               0, 0,
+				               WINPR_ASSERTING_INT_CAST(uint32_t, event->width),
+				               WINPR_ASSERTING_INT_CAST(uint32_t, event->height));
+				XFreeGC(xfc->display, fillGC);
+			}
 #ifdef WITH_XRENDER
 			xfc->offset_x = 0;
 			xfc->offset_y = 0;
