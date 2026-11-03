@@ -1,5 +1,8 @@
 name: Build RDP-client
 
+permissions:
+  contents: write
+
 on:
   push:
     branches: [main, master]
@@ -9,7 +12,7 @@ on:
 
 jobs:
   build-ubuntu:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
 
@@ -37,27 +40,29 @@ jobs:
         run: |
           cmake --install build --prefix staging/opt/RDP-client
           tar czf RDP-client-linux-x86_64.tar.gz -C staging .
+          ls -lh *.tar.gz
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: RDP-client-linux-x86_64
           path: RDP-client-linux-x86_64.tar.gz
+          if-no-files-found: error
 
   build-fedora:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: fedora:latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install dependencies
+      - name: Install deps (dnf)
         run: |
-          dnf install -y cmake gcc gcc-c++ ninja-build \
+          dnf install -y git cmake gcc gcc-c++ ninja-build tar \
             openssl-devel \
             libX11-devel libXext-devel libXcursor-devel libXrender-devel \
             libXfixes-devel libXi-devel libXrandr-devel libXdamage-devel \
             libXinerama-devel libXv-devel \
             pulseaudio-libs-devel cups-devel fuse3-devel
+
+      - uses: actions/checkout@v4
 
       - name: Configure
         run: |
@@ -72,35 +77,41 @@ jobs:
         run: |
           cmake --install build --prefix staging/opt/RDP-client
           tar czf RDP-client-linux-x86_64-fedora.tar.gz -C staging .
+          ls -lh *.tar.gz
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: RDP-client-linux-x86_64-fedora
           path: RDP-client-linux-x86_64-fedora.tar.gz
+          if-no-files-found: error
 
   release:
     needs: [build-ubuntu, build-fedora]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: startsWith(github.ref, 'refs/tags/v')
-    permissions:
-      contents: write
     steps:
       - name: Download Ubuntu artifact
         uses: actions/download-artifact@v4
         with:
           name: RDP-client-linux-x86_64
+          path: .
 
       - name: Download Fedora artifact
         uses: actions/download-artifact@v4
         with:
           name: RDP-client-linux-x86_64-fedora
+          path: .
+
+      - name: Verify artifacts
+        run: ls -lh *.tar.gz
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            RDP-client-linux-x86_64.tar.gz
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "RDP-client ${GITHUB_REF_NAME}" \
+            --generate-notes \
+            RDP-client-linux-x86_64.tar.gz \
             RDP-client-linux-x86_64-fedora.tar.gz
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
