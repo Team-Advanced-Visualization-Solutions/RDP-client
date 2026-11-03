@@ -1573,15 +1573,19 @@ static DWORD WINAPI xf_client_thread(LPVOID param)
 		if (waitStatus == WAIT_FAILED)
 			break;
 
-		/* Keep-alive: emulate user activity so the remote session does not
-		 * idle-lock.  We send a mouse-move event (PTR_FLAGS_MOVE) at the last
-		 * known cursor position.  The coordinates do not change, so the cursor
-		 * stays visually in place, but the event still counts as fresh input
-		 * and resets the server's idle timer (GetLastInputInfo).
+		/* Keep-alive: prevent remote Windows session from idle-locking.
 		 *
-		 * The previous approach (mouse without flags + F15) failed because
-		 * pointerFlags=0 is ignored by Windows, and F15 is not recognised on
-		 * many server keyboard layouts. */
+		 * Windows tracks user activity via GetLastInputInfo(), which requires
+		 * an input event with non-zero movement or a real key press.  Sending
+		 * PTR_FLAGS_MOVE with identical coordinates is NOT sufficient — delta
+		 * must be non-zero.
+		 *
+		 * We therefore nudge the cursor 1 px left/right at the current position
+		 * and immediately restore it.  The motion is visually imperceptible but
+		 * Windows sees a real cursor move and resets its idle timer.
+		 *
+		 * A Left-Shift press/release is sent as extra insurance; Shift exists
+		 * on every keyboard layout and produces no visible text or action. */
 		if (xfc->keepalive)
 		{
 			struct timespec ts;
@@ -1595,18 +1599,17 @@ static DWORD WINAPI xf_client_thread(LPVOID param)
 
 					rdpInput* input = xfc->common.context.input;
 
-					if (xfc->common.lastX > 0 || xfc->common.lastY > 0)
-					{
-						WLog_DBG(TAG, "keepalive: PTR_FLAGS_MOVE at %dx%d",
-						         xfc->common.lastX, xfc->common.lastY);
-						freerdp_input_send_mouse_event(input, PTR_FLAGS_MOVE,
-						                                (UINT16)xfc->common.lastX,
-						                                (UINT16)xfc->common.lastY);
-					}
-					else
-					{
-						WLog_DBG(TAG, "keepalive: cursor position unknown, skipped");
-					}
+					UINT16 curX = (UINT16)(xfc->common.lastX > 0 ? xfc->common.lastX : 10);
+					UINT16 curY = (UINT16)(xfc->common.lastY > 0 ? xfc->common.lastY : 10);
+					UINT16 nudgeX = (curX > 0) ? (curX - 1) : (curX + 1);
+
+					WLog_DBG(TAG, "keepalive: mouse nudge %dx%d -> %dx%d", curX, curY, nudgeX, curY);
+					freerdp_input_send_mouse_event(input, PTR_FLAGS_MOVE, nudgeX, curY);
+					freerdp_input_send_mouse_event(input, PTR_FLAGS_MOVE, curX,  curY);
+
+					WLog_DBG(TAG, "keepalive: LShift tap");
+					freerdp_input_send_keyboard_event_ex(input, TRUE,  FALSE, RDP_SCANCODE_LSHIFT);
+					freerdp_input_send_keyboard_event_ex(input, FALSE, FALSE, RDP_SCANCODE_LSHIFT);
 				}
 			}
 		}
