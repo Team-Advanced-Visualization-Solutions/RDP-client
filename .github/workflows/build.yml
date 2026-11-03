@@ -107,7 +107,9 @@ jobs:
           path: artifacts
 
       - name: Verify artifacts
-        run: ls -lh artifacts/*.tar.gz
+        run: |
+          ls -lh artifacts/*.tar.gz
+          ls -1 artifacts/*.tar.gz > /tmp/files.txt
 
       - uses: actions/checkout@v4
 
@@ -116,6 +118,6 @@ jobs:
           gh release create "${GITHUB_REF_NAME}" \
             --title "RDP-client ${GITHUB_REF_NAME}" \
             --generate-notes \
-            artifacts/*.tar.gz
+            $(cat /tmp/files.txt)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
